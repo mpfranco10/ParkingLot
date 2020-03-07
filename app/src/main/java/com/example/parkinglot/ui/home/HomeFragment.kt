@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.R
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -22,6 +20,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var mMap: GoogleMap
 
+    companion object {
+        var mapFragment : SupportMapFragment?=null
+        val TAG: String = HomeFragment::class.java.simpleName
+        fun newInstance() = HomeFragment()
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -35,16 +38,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         //homeViewModel.text.observe(viewLifecycleOwner, Observer {
         //    textView.text = it
         //})
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
+        mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment?.getMapAsync(this)
 
-        if (mapFragment != null) {
-            val transaction = getActivity()?.getSupportFragmentManager()?.beginTransaction()
-            if (transaction != null) {
-                transaction.replace(R.id.map, mapFragment)
-                transaction.commit()
-            }
-        }
 
         return root
     }
@@ -53,8 +49,21 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+        val sydney = LatLng(4.694906, -74.086188)
+        mMap.addMarker(MarkerOptions().position(sydney).title("Parqueadero Titán Plaza"))
+
+        val p2 = LatLng(4.696882, -74.095394)
+        mMap.addMarker(MarkerOptions().position(p2).title("Parqueadero 24 Horas"))
+
+        val p3 = LatLng(4.690880, -74.093454)
+        mMap.addMarker(MarkerOptions().position(p3).title("Parqueadero El Puente"))
+
+        val p4 = LatLng(4.686675, -74.085108)
+        mMap.addMarker(MarkerOptions().position(p4).title("Parqueadero Lastín"))
+
+        val zoomLevel = 14.0f //This goes up to 21
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, zoomLevel))
     }
 }
