@@ -3,6 +3,7 @@
     <string name="title_home">Inicio</string>
     <string name="title_dashboard">Tiempo real</string>
     <string name="title_notifications">Perfil</string>
+    <string name="title_parkinglots">Parqueaderos</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_search">Ingrese el código del parqueadero manualmente</string>
     <string name="boton_enviar">Enviar</string>

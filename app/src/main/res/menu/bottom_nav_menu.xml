@@ -12,6 +12,11 @@
         android:title="@string/title_dashboard" />
 
     <item
+        android:id="@+id/navigation_parkinglots"
+        android:icon="@drawable/ic_local_parking_black_24dp"
+        android:title="@string/title_parkinglots" />
+
+    <item
         android:id="@+id/navigation_notifications"
         android:icon="@drawable/ic_person_black_24dp"
         android:title="@string/title_notifications" />

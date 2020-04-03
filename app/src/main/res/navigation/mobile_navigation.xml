@@ -22,4 +22,10 @@
         android:name="com.example.parkinglot.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_parkinglots"
+        android:name="com.example.parkinglot.ui.parkinglots.ParkinglotsFragment"
+        android:label="@string/title_parkinglots"
+        tools:layout="@layout/fragment_parkinglots" />
 </navigation>
