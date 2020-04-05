@@ -29,8 +29,6 @@ class NotificationsFragment : Fragment() {
         //    textView.text = it
         // })
 
-
-
         return root
     }
 }

@@ -62,6 +62,7 @@
         android:padding="16dp"
         android:text="@string/boton_enviar"
         android:textSize="14sp"
+        android:onClick="guardar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"

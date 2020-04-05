@@ -1,19 +1,17 @@
 package com.example.parkinglot.ui.parkinglots
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.MainActivity
 import com.example.parkinglot.R
+import java.io.File
+
 
 class ParkinglotsFragment : Fragment() {
 
@@ -36,16 +34,19 @@ class ParkinglotsFragment : Fragment() {
         val context = context as MainActivity
 
         val arrayList = ArrayList<String>()//Creating an empty arraylist
-        arrayList.add("Ajay")//Adding object in arraylist
-        arrayList.add("Vijayaddddddsda")
-        arrayList.add("Prakashadsssssss")
-        arrayList.add("Rohanaddddddddda")
-        arrayList.add("Vijaadsssssssssssssssady")
+
+        arrayList.add(" ")
+        arrayList.add(" ")
+
+        val lfile = File(context!!.filesDir, "PARQUEOS.txt")
+
+        lfile.forEachLine {
+            arrayList.add(it)
+        }
 
         //esto sirve pero sale error no se por que xd
         val adapter = ArrayAdapter(context,  R.layout.simple_list_item_1 , arrayList)
         lv.adapter = adapter
-
 
         return root
     }
