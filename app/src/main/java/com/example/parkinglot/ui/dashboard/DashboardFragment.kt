@@ -44,6 +44,7 @@ class DashboardFragment : Fragment() {
         root.bSearch.setOnClickListener { view ->
             var editTextHello = root.findViewById(R.id.textInputEditText) as EditText
             guardar(editTextHello.text.toString())
+            actualizar(editTextHello.text.toString())
             Toast.makeText(
                 getActivity(),
                 "Se recibió el código!" + editTextHello.text,
@@ -52,6 +53,18 @@ class DashboardFragment : Fragment() {
         }
 
         return root
+    }
+
+    private fun actualizar(str: String)
+    {
+        val lfile = File(context!!.filesDir, "PARQUEADERO.txt")
+        lfile.createNewFile()
+
+        val lfilewriter = FileWriter(lfile)
+
+        val lout = BufferedWriter(lfilewriter)
+        lout.write(str)
+        lout.close()
     }
 
     fun guardar(str: String)
