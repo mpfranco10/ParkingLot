@@ -71,7 +71,11 @@ class DashboardFragment : Fragment() {
     {
         var resp = str
         val lfile = File(context!!.filesDir, "PARQUEOS.txt")
-        //lfile.createNewFile()
+
+        if (!lfile.exists())
+        {
+            lfile.createNewFile()
+        }
 
         lfile.forEachLine {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)

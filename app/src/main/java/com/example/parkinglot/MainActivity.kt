@@ -2,6 +2,7 @@ package com.example.parkinglot
 
 import android.content.Context
 import android.location.Location
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -60,5 +61,38 @@ class MainActivity : AppCompatActivity()
         val lout = BufferedWriter(lfilewriter)
         lout.write(resp)
         lout.close()
+
+        val data = File(getFilesDir(), "MAIN.txt")
+
+        if(!data.exists())
+        {
+            data.createNewFile()
+
+            var datos = "parqueadero1"
+            datos = datos + "\n" + "parqueadero2"
+            datos = datos + "\n" + "parqueadero2"
+            datos = datos + "\n" + "parqueadero3"
+            datos = datos + "\n" + "parqueadero4"
+            datos = datos + "\n" + "parqueadero5"
+            datos = datos + "\n" + "parqueadero6"
+            datos = datos + "\n" + "parqueadero7"
+            datos = datos + "\n" + "parqueadero8"
+            datos = datos + "\n" + "parqueadero9"
+            datos = datos + "\n" + "parqueadero10"
+            datos = datos + "\n" + "parqueadero12"
+
+            val myDataWriter = FileWriter(data)
+
+            val dataOut = BufferedWriter(myDataWriter)
+            dataOut.write(datos)
+            dataOut.close()
+        }
+    }
+
+    fun verifyAvailableNetwork(activity:AppCompatActivity):Boolean
+    {
+        val connectivityManager=activity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo=connectivityManager.activeNetworkInfo
+        return  networkInfo!=null && networkInfo.isConnected
     }
 }

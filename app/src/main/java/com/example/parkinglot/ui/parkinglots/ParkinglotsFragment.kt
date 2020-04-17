@@ -40,8 +40,11 @@ class ParkinglotsFragment : Fragment() {
 
         val lfile = File(context!!.filesDir, "PARQUEOS.txt")
 
-        lfile.forEachLine {
-            arrayList.add(it)
+        if (lfile.exists())
+        {
+            lfile.forEachLine {
+                arrayList.add(it)
+            }
         }
 
         //esto sirve pero sale error no se por que xd
