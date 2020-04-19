@@ -43,24 +43,31 @@ class MainActivity : AppCompatActivity()
 
         var resp = location.toString()
         val lfile = File(getFilesDir(), "LOCATION.txt")
-        lfile.createNewFile()
 
-        lfile.forEachLine {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            {
-                resp = it + ";"+ DateTimeFormatter.ISO_INSTANT.format(Instant.now()).toString() + "\n" + resp
+        val connectivityManager=this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo=connectivityManager.activeNetworkInfo
+
+        if( networkInfo!=null && networkInfo.isConnected)
+        {
+            lfile.createNewFile()
+
+            lfile.forEachLine {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                {
+                    resp = it + ";"+ DateTimeFormatter.ISO_INSTANT.format(Instant.now()).toString() + "\n" + resp
+                }
+                else
+                {
+                    resp = it + ";nil" + "\n" + resp
+                }
             }
-            else
-            {
-                resp = it + ";nil" + "\n" + resp
-            }
+
+            val lfilewriter = FileWriter(lfile)
+
+            val lout = BufferedWriter(lfilewriter)
+            lout.write(resp)
+            lout.close()
         }
-
-        val lfilewriter = FileWriter(lfile)
-
-        val lout = BufferedWriter(lfilewriter)
-        lout.write(resp)
-        lout.close()
 
         val data = File(getFilesDir(), "MAIN.txt")
 
