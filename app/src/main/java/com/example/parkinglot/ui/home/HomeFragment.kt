@@ -1,29 +1,44 @@
 package com.example.parkinglot.ui.home
 
+import android.content.Context.CONNECTIVITY_SERVICE
+import android.content.pm.PackageManager
+import android.location.Location
+import android.net.ConnectivityManager
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import com.example.parkinglot.MainActivity
 import com.example.parkinglot.R
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Marker
+
 
 @Suppress("DEPRECATION")
-class HomeFragment : Fragment(), OnMapReadyCallback {
+class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var homeViewModel: HomeViewModel
-    private lateinit var mMap: GoogleMap
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var map: GoogleMap
+    private lateinit var lastLocation: Location
+
 
     companion object {
         var mapFragment : SupportMapFragment?=null
         val TAG: String = HomeFragment::class.java.simpleName
         fun newInstance() = HomeFragment()
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
 
     override fun onCreateView(
@@ -41,29 +56,63 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment?.getMapAsync(this)
 
+        val context = context as MainActivity
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+        if(!isNetwork()){
+           Toast.makeText(getActivity(),"No hay conexión a internet. Por favor conéctate para ver el mapa.", Toast.LENGTH_LONG).show();
+
+        }
 
         return root
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
+        map = googleMap
+        val context = context as MainActivity
         // Add a marker in Sydney and move the camera
 
-        val sydney = LatLng(4.694906, -74.086188)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Parqueadero Titán Plaza"))
+        map.getUiSettings().setZoomControlsEnabled(true)
+        map.setOnMarkerClickListener(this)
 
-        val p2 = LatLng(4.696882, -74.095394)
-        mMap.addMarker(MarkerOptions().position(p2).title("Parqueadero 24 Horas"))
+        setUpMap()
 
-        val p3 = LatLng(4.690880, -74.093454)
-        mMap.addMarker(MarkerOptions().position(p3).title("Parqueadero El Puente"))
+        // 1
+        map.isMyLocationEnabled = true
 
-        val p4 = LatLng(4.686675, -74.085108)
-        mMap.addMarker(MarkerOptions().position(p4).title("Parqueadero Lastín"))
-
-        val zoomLevel = 14.0f //This goes up to 21
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, zoomLevel))
+// 2
+        fusedLocationClient.lastLocation.addOnSuccessListener(context) { location ->
+            // Got last known location. In some rare situations this can be null.
+            // 3
+            if (location != null) {
+                lastLocation = location
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 13f))
+            }
+        }
     }
+
+    private fun setUpMap() {
+        val context = context as MainActivity
+        if (ActivityCompat.checkSelfPermission(context,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(context,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+            return
+        }
+    }
+
+    override fun onMarkerClick(p0: Marker?) = false
+
+    fun isNetwork(): Boolean {
+        val connectivityManager = context?.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        // In here we return true if network is not null and Network is connected
+        if(networkInfo != null && networkInfo.isConnected){
+            return true
+        }
+        return false
+
+    }
+
 }
