@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ParkingLot</string>
+    <string name="app_name">Carnest</string>
     <string name="title_home">Inicio</string>
     <string name="title_dashboard">Tiempo real</string>
     <string name="title_notifications">Perfil</string>
@@ -8,4 +8,13 @@
     <string name="title_search">Ingrese el código del parqueadero manualmente</string>
     <string name="boton_enviar">Enviar</string>
     <string name="boton_escanear">Escanear código</string>
+    <string name="title_activity_login">Iniciar sesión</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Iniciar sesión</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Nombre de usuario no válido</string>
+    <string name="invalid_password">La contraseña debe ser mayor que 5 caracteres</string>
+    <string name="login_failed">"Login failed"</string>
 </resources>
