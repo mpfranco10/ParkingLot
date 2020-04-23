@@ -18,7 +18,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import com.example.parkinglot.MainActivity
 import com.example.parkinglot.R
-import com.example.parkinglot.RegisterActivity
+import com.example.parkinglot.register.ui.register.RegisterActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -103,8 +103,10 @@ class LoginActivity : AppCompatActivity() {
 
             register.setOnClickListener {
 
-                val intent = Intent(this@LoginActivity,RegisterActivity::class.java)
+                val intent = Intent(this@LoginActivity,
+                    RegisterActivity::class.java)
                 startActivity(intent)
+                finish()
             }
         }
     }
@@ -120,6 +122,7 @@ class LoginActivity : AppCompatActivity() {
 
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {

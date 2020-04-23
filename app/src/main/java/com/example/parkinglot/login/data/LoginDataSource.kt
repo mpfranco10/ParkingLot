@@ -2,6 +2,9 @@ package com.example.parkinglot.login.data
 
 import com.example.parkinglot.login.data.model.LoggedInUser
 import java.io.IOException
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.

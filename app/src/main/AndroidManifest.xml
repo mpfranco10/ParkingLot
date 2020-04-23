@@ -49,7 +49,7 @@
         </activity>
 
         <activity
-            android:name=".RegisterActivity"
+            android:name=".register.ui.register.RegisterActivity"
             android:label="Registro">
         </activity>
 

@@ -2,6 +2,8 @@ package com.example.parkinglot.ui.notifications
 
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
@@ -15,6 +17,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.*
+import com.example.parkinglot.login.ui.login.LoginActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 
@@ -22,6 +25,8 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 class NotificationsFragment : Fragment() {
 
     private lateinit var notificationsViewModel: NotificationsViewModel
+    private var PRIVATE_MODE = 0
+    private val PREF_NAME = "alreadylogged"
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -42,6 +47,7 @@ class NotificationsFragment : Fragment() {
         val tp:TextView= root.findViewById(R.id.textPark)
 
         val btnPrueba: Button = root.findViewById(R.id.boton_park)
+        val btncerrar: Button = root.findViewById(R.id.bClose)
         val db = FirebaseFirestore.getInstance()
         // [END get_firestore_instance]
 
@@ -106,6 +112,19 @@ class NotificationsFragment : Fragment() {
                     "Nombre:" + nombre + ",imagen:" + imagen + ",precio:" + precio + ",horario:" + horario
                 //dbHandler.addName(user)
             }
+        }
+
+        btncerrar.setOnClickListener{
+            val context = context as MainActivity
+            val sharedPref: SharedPreferences? = activity?.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
+            val editor = sharedPref?.edit()
+            if (editor != null) {
+                editor.putBoolean(PREF_NAME, true)
+                editor.apply()
+            }
+            val intent = Intent(context, LoginActivity::class.java)
+            startActivity(intent)
+            context.finish()
         }
 
 
