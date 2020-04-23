@@ -55,7 +55,7 @@ class NotificationsFragment : Fragment() {
         // [END set_firestore_settings]
 
         db.collection("users")
-            .whereEqualTo("firstname", "Sergio")
+            .whereEqualTo("firstname", "Maria")
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {

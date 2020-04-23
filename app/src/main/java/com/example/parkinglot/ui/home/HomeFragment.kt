@@ -75,7 +75,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
         map.getUiSettings().setZoomControlsEnabled(true)
         map.setOnMarkerClickListener(this)
 
-        setUpMap()
+
 
         if (ActivityCompat.checkSelfPermission(context,
                 android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) { //aun no hay permisos
@@ -84,6 +84,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
 
         }
         else{ //si hay permisos
+            setUpMap()
             centrarLocalizacion()
         }
 
@@ -96,6 +97,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     // permission was granted, yay! Do the
+                    setUpMap()
                     centrarLocalizacion()
                 } else {
                     // permission denied, boo! Disable the

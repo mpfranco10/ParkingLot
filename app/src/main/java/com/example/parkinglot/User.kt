@@ -9,5 +9,9 @@ data class User(
     var firstname: String? = "",
     var gender: Int? = 0,
     var lastname: String? = "",
-    var phone_number: Int? = 0
+    var phone_number: Int? = 0,
+    var username: String? = "",
+    var password: String? = "",
+    var saldo: Int? = 0
+
 )

@@ -18,6 +18,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import com.example.parkinglot.MainActivity
 import com.example.parkinglot.R
+import com.example.parkinglot.RegisterActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -33,6 +34,7 @@ class LoginActivity : AppCompatActivity() {
         val username = findViewById<EditText>(R.id.username)
         val password = findViewById<EditText>(R.id.password)
         val login = findViewById<Button>(R.id.login)
+        val register = findViewById<Button>(R.id.login2)
         val loading = findViewById<ProgressBar>(R.id.loading)
 
         loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory())
@@ -97,6 +99,12 @@ class LoginActivity : AppCompatActivity() {
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
                 loginViewModel.login(username.text.toString(), password.text.toString())
+            }
+
+            register.setOnClickListener {
+
+                val intent = Intent(this@LoginActivity,RegisterActivity::class.java)
+                startActivity(intent)
             }
         }
     }
