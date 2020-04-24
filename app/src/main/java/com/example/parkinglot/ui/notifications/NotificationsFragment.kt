@@ -18,8 +18,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.*
 import com.example.parkinglot.login.ui.login.LoginActivity
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import java.io.File
 
 
 class NotificationsFragment : Fragment() {
@@ -40,6 +43,9 @@ class NotificationsFragment : Fragment() {
         // notificationsViewModel.text.observe(viewLifecycleOwner, Observer {
         //    textView.text = it
         // })
+
+        var database = FirebaseFirestore.getInstance()
+
         val t:TextView= root.findViewById(R.id.text_notifications2)
         val tum:TextView= root.findViewById(R.id.text_edad2)
         val ted:TextView= root.findViewById(R.id.text_edad)
@@ -110,7 +116,41 @@ class NotificationsFragment : Fragment() {
                 val user = Parqueadero(nombre, precio, horario, imagen)
                 val valores =
                     "Nombre:" + nombre + ",imagen:" + imagen + ",precio:" + precio + ",horario:" + horario
+
+                val lfile = File(context.getFilesDir(), "PARQUEADERO.txt")
+                var resp = ""
+                var id = ""
+                lfile.forEachLine {
+                    resp = it.split(";")[1]
+                    id = it.split(";")[0]
+                }
                 //dbHandler.addName(user)
+                var units = (java.util.Calendar.getInstance().timeInMillis.toDouble()-resp.toDouble())/3600000
+                val docRef = database.collection("malls").document(id.toString())
+                docRef.get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                    if (task.isSuccessful)
+                    {
+                        val document = task.result?.toString()
+
+                        if (document?.contains("doc=null")!!)
+                        {
+                        }
+                        else
+                        {
+                            Toast.makeText(context,"No existe el parqueadero: " + id, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else
+                    {
+                        Log.d(TAG, "get failed with ", task.exception)
+                    }
+                })
+
+                units = units*1
+                Toast.makeText(getActivity(),"Debes: " + units.toString() + "!", Toast.LENGTH_SHORT).show();
+                println(java.util.Calendar.getInstance().timeInMillis.toString())
+                println(units)
+                println(valores)
             }
         }
 
