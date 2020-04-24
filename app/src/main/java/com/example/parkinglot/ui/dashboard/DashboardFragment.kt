@@ -1,8 +1,15 @@
 package com.example.parkinglot.ui.dashboard
 
+import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
+<<<<<<< Updated upstream
 import android.os.Build
+=======
+import android.net.ConnectivityManager
+>>>>>>> Stashed changes
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,13 +19,23 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.R
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 import java.io.BufferedWriter
 import java.io.File
+<<<<<<< Updated upstream
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.time.Instant
 import java.time.format.DateTimeFormatter
+=======
+import java.io.FileWriter
+
+>>>>>>> Stashed changes
 
 class DashboardFragment : Fragment() {
 
@@ -30,7 +47,14 @@ class DashboardFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         dashboardViewModel =
+<<<<<<< Updated upstream
             ViewModelProviders.of(this).get(DashboardViewModel::class.java)
+=======
+                ViewModelProviders.of(this).get(DashboardViewModel::class.java)
+
+        var database = FirebaseFirestore.getInstance()
+
+>>>>>>> Stashed changes
         val root = inflater.inflate(R.layout.fragment_dashboard, container, false)
 
         //val textView: TextView = root.findViewById(R.id.text_dashboard)
@@ -43,6 +67,7 @@ class DashboardFragment : Fragment() {
 
         root.bSearch.setOnClickListener { view ->
             var editTextHello = root.findViewById(R.id.textInputEditText) as EditText
+<<<<<<< Updated upstream
             guardar(editTextHello.text.toString())
             actualizar(editTextHello.text.toString())
             Toast.makeText(
@@ -50,6 +75,56 @@ class DashboardFragment : Fragment() {
                 "Se recibió el código!" + editTextHello.text,
                 Toast.LENGTH_SHORT
             ).show();
+=======
+
+            val connectivityManager= context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo=connectivityManager.activeNetworkInfo
+
+            if(networkInfo!=null && networkInfo.isConnected)
+            {
+                val docRef = database.collection("malls").document(editTextHello.text.toString())
+
+                docRef.get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                    if (task.isSuccessful)
+                    {
+                        val document = task.result?.toString()
+                        val out = task.result
+                        println (out)
+                        println (document)
+
+                        if (!document?.contains("doc=null")!!)
+                        {
+                            Toast.makeText(getActivity(),"Se recibió el código!" + editTextHello.text, Toast.LENGTH_SHORT).show();
+                            val lfile = File(context?.getFilesDir(), "PARQUEADERO.txt")
+                            lfile.createNewFile()
+                            val lfilewriter = FileWriter(lfile)
+                            val lout = BufferedWriter(lfilewriter)
+                            lout.write(editTextHello.text.toString()+";"+java.util.Calendar.getInstance().timeInMillis.toString())
+                            lout.close()
+                        }
+                        else
+                        {
+                            Toast.makeText(getActivity(),"No existe el parqueadero: " + editTextHello.text, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else
+                    {
+                        Log.d(TAG, "get failed with ", task.exception)
+                    }
+                })
+            }
+            else
+            {
+                Toast.makeText(getActivity(),"No hay internet!", Toast.LENGTH_SHORT).show();
+
+                val lfile = File(context?.getFilesDir(), "PENDIENTEPARQUEADERO.txt")
+                lfile.createNewFile()
+                val lfilewriter = FileWriter(lfile)
+                val lout = BufferedWriter(lfilewriter)
+                lout.write(editTextHello.text.toString()+";"+java.util.Calendar.getInstance().timeInMillis.toString())
+                lout.close()
+            }
+>>>>>>> Stashed changes
         }
 
         return root

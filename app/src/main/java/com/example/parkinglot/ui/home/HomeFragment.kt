@@ -18,7 +18,13 @@ import com.google.android.gms.maps.model.MarkerOptions
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var homeViewModel: HomeViewModel
+<<<<<<< Updated upstream
     private lateinit var mMap: GoogleMap
+=======
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var map: GoogleMap
+    private lateinit var lastLocation: Location
+>>>>>>> Stashed changes
 
     companion object {
         var mapFragment : SupportMapFragment?=null
