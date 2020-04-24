@@ -15,4 +15,8 @@ sealed class Result<out T : Any> {
             is Error -> "Error[exception=$exception]"
         }
     }
+
+    operator fun invoke(function: () -> Unit) {
+
+    }
 }
