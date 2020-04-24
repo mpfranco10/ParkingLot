@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.*
 import com.example.parkinglot.login.ui.login.LoginActivity
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -45,6 +46,7 @@ class NotificationsFragment : Fragment() {
         // })
 
         var database = FirebaseFirestore.getInstance()
+        var databaseInstance =  FirebaseDatabase.getInstance().getReference("malls")
 
         val t:TextView= root.findViewById(R.id.text_notifications2)
         val tum:TextView= root.findViewById(R.id.text_edad2)
@@ -108,6 +110,7 @@ class NotificationsFragment : Fragment() {
             /////////////////////////
 
             if(isNetwork()) {
+                println("OMMMMMMMMMMMMMMMMMMMMMMMMGGGGGGGGGGGGGGGGGGGGGGGG")
                 val dbHandler = ParqueaderoOpenHelper(context, null)
                 val nombre = "Parqueadero"
                 val imagen = "-"
@@ -126,17 +129,32 @@ class NotificationsFragment : Fragment() {
                 }
                 //dbHandler.addName(user)
                 var units = (java.util.Calendar.getInstance().timeInMillis.toDouble()-resp.toDouble())/3600000
+
                 val docRef = database.collection("malls").document(id.toString())
                 docRef.get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                    println("OMGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG2")
                     if (task.isSuccessful)
                     {
+                        println("QUEPUTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAS")
                         val document = task.result?.toString()
+                        println(document)
 
-                        if (document?.contains("doc=null")!!)
+                        if (!document?.contains("doc=null")!!)
                         {
+                            var str = task.result?.data.toString()
+                            var indx = str.indexOf("parking_car_cost=")+17
+                            str = str.substring(indx)
+                            indx = str.indexOf(",");
+                            str = str.substring(0,indx)
+
+                            units = units*str.toDouble()
+                            Toast.makeText(getActivity(),"Debes: " + units.toString() + "!", Toast.LENGTH_SHORT).show();
+
+                            lfile.createNewFile()
                         }
                         else
                         {
+                            println("XCHAAAAAAN")
                             Toast.makeText(context,"No existe el parqueadero: " + id, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -145,12 +163,6 @@ class NotificationsFragment : Fragment() {
                         Log.d(TAG, "get failed with ", task.exception)
                     }
                 })
-
-                units = units*1
-                Toast.makeText(getActivity(),"Debes: " + units.toString() + "!", Toast.LENGTH_SHORT).show();
-                println(java.util.Calendar.getInstance().timeInMillis.toString())
-                println(units)
-                println(valores)
             }
         }
 

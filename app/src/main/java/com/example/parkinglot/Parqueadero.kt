@@ -21,4 +21,5 @@ class Parqueadero {
         this.horario = horario
         this.imagen = imagen
     }
+
 }
