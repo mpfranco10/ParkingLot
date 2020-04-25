@@ -9,11 +9,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.R
+import com.example.parkinglot.ScanActivity
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -43,8 +45,12 @@ class DashboardFragment : Fragment() {
         //dashboardViewModel.text.observe(viewLifecycleOwner, Observer {
         //    textView.text = it
         // })
-        root.bScan.setOnClickListener { view ->
-            Toast.makeText(getActivity(),"Función para escanear QR", Toast.LENGTH_SHORT).show();
+
+
+
+        root.bScan.setOnClickListener {
+            val intent = Intent(activity, ScanActivity::class.java)
+            startActivity(intent)
         }
 
         root.bSearch.setOnClickListener { view ->

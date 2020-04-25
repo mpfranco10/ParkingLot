@@ -2,15 +2,14 @@ package com.example.parkinglot
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.location.Location
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -31,11 +30,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
+        fixGoogleMapBug()
         setContentView(R.layout.activity_main)
 
         var database = FirebaseFirestore.getInstance()
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
+
+        tvresult = findViewById<TextView>(R.id.tvresult)
 
         val navController = findNavController(R.id.nav_host_fragment)
 
@@ -116,6 +119,20 @@ class MainActivity : AppCompatActivity() {
      * installed Google Play services and returned to the app.
      */
 
+
+    private fun fixGoogleMapBug() {
+        val googleBug: SharedPreferences = getSharedPreferences("google_bug", Context.MODE_PRIVATE)
+        if (!googleBug.contains("fixed")) {
+            val corruptedZoomTables = File(getFilesDir(), "ZoomTables.data")
+            corruptedZoomTables.delete()
+            googleBug.edit().putBoolean("fixed", true).apply()
+        }
+    }
+
+    companion object {
+
+        var tvresult: TextView? = null
+    }
 
     fun escanear(view: View) {}
 }

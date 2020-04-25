@@ -1,11 +1,11 @@
 package com.example.parkinglot.ui.home
 
 import android.content.Context.CONNECTIVITY_SERVICE
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,6 +66,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
 
         return root
     }
+
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
