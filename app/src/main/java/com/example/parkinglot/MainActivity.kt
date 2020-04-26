@@ -54,6 +54,8 @@ class MainActivity : AppCompatActivity() {
 
         val lfile = File(getFilesDir(), "LOCATION.txt")
         val lfile2 = File(getFilesDir(), "PENDIENTEPARQUEADERO.txt")
+        println (getFilesDir().toString())
+        val lfile4 = File(getFilesDir(), "PARQUEADERO.txt")
 
         val connectivityManager=this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo=connectivityManager.activeNetworkInfo
@@ -62,6 +64,15 @@ class MainActivity : AppCompatActivity() {
         {
             var location = Location("me")
             var resp = location.toString()
+
+            if(!lfile4.exists())
+            {
+                lfile4.createNewFile()
+                val lfilewriter = FileWriter(lfile4)
+                val lout = BufferedWriter(lfilewriter)
+                lout.write("EMPTY"+";"+"EMPTY")
+                lout.close()
+            }
 
             if(lfile2.exists())
             {

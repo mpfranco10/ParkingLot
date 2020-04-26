@@ -23,7 +23,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import java.io.BufferedWriter
 import java.io.File
+import java.io.FileWriter
+import kotlin.math.roundToInt
 
 
 class NotificationsFragment : Fragment() {
@@ -110,7 +113,6 @@ class NotificationsFragment : Fragment() {
             /////////////////////////
 
             if(isNetwork()) {
-                println("OMMMMMMMMMMMMMMMMMMMMMMMMGGGGGGGGGGGGGGGGGGGGGGGG")
                 val dbHandler = ParqueaderoOpenHelper(context, null)
                 val nombre = "Parqueadero"
                 val imagen = "-"
@@ -127,43 +129,97 @@ class NotificationsFragment : Fragment() {
                     resp = it.split(";")[1]
                     id = it.split(";")[0]
                 }
-                //dbHandler.addName(user)
-                var units = (java.util.Calendar.getInstance().timeInMillis.toDouble()-resp.toDouble())/3600000
 
-                val docRef = database.collection("malls").document(id.toString())
-                docRef.get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
-                    println("OMGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG2")
-                    if (task.isSuccessful)
-                    {
-                        println("QUEPUTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAS")
-                        val document = task.result?.toString()
-                        println(document)
+                if(!resp.equals("EMPTY"))
+                {
+                    //dbHandler.addName(user)
+                    var units = (java.util.Calendar.getInstance().timeInMillis.toDouble()-resp.toDouble())/3600000
 
-                        if (!document?.contains("doc=null")!!)
+                    val docRef = database.collection("malls").document(id.toString())
+                    docRef.get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                        if (task.isSuccessful)
                         {
-                            var str = task.result?.data.toString()
-                            var indx = str.indexOf("parking_car_cost=")+17
-                            str = str.substring(indx)
-                            indx = str.indexOf(",");
-                            str = str.substring(0,indx)
+                            val document = task.result?.toString()
 
-                            units = units*str.toDouble()
-                            Toast.makeText(getActivity(),"Debes: " + units.toString() + "!", Toast.LENGTH_SHORT).show();
+                            if (!document?.contains("doc=null")!!)
+                            {
+                                var str = task.result?.data.toString()
+                                var indx = str.indexOf("parking_car_cost=")+17
+                                str = str.substring(indx)
+                                indx = str.indexOf(",");
+                                str = str.substring(0,indx)
 
-                            lfile.createNewFile()
+                                val lfile = File(context.getFilesDir(), "USERS.txt")
+                                var username = "EMPTY"
+                                lfile.forEachLine {
+                                    username = it.split(";")[0]
+                                }
+
+                                if(!username.equals("EMPTY"))
+                                {
+                                    units = units*str.toDouble()
+                                    Toast.makeText(getActivity(),"Debes: " + units.roundToInt().toString() + " !", Toast.LENGTH_SHORT).show();
+                                    val docRef2 = database.collection("users").document(username)
+
+                                    docRef2.get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                                        if (task.isSuccessful)
+                                        {
+                                            val document2 = task.result?.toString()
+
+                                            if (!document2?.contains("doc=null")!!)
+                                            {
+                                                var x = task.result?.data.toString()
+                                                var indx2 = x.indexOf("saldo=")+6
+                                                x = x.substring(indx2)
+                                                indx2 = x.indexOf(",");
+                                                x = x.substring(0,indx2)
+
+                                                var nSaldo = (x.toDouble()-units).roundToInt()
+
+                                                if(nSaldo>=0)
+                                                {
+                                                    docRef2.update("saldo",nSaldo)
+
+                                                    lfile.createNewFile()
+
+                                                    val lfilewriter = FileWriter(lfile)
+                                                    val lout = BufferedWriter(lfilewriter)
+                                                    lout.write("EMPTY"+";"+"EMPTY")
+                                                    lout.close()
+                                                }
+                                                else
+                                                {
+                                                    Toast.makeText(context,"No suficiente Saldo", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        }
+                                    })
+                                }
+                                else
+                                {
+                                    Toast.makeText(context,"NO EXISTES", Toast.LENGTH_SHORT).show();
+                                }
+
+
+                            }
+                            else
+                            {
+                                Toast.makeText(context,"No existe el parqueadero: " + id, Toast.LENGTH_SHORT).show();
+                            }
                         }
                         else
                         {
-                            println("XCHAAAAAAN")
-                            Toast.makeText(context,"No existe el parqueadero: " + id, Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "get failed with ", task.exception)
                         }
-                    }
-                    else
-                    {
-                        Log.d(TAG, "get failed with ", task.exception)
-                    }
-                })
+                    })
+                }
+                else
+                {
+                    Toast.makeText(context,"No esta registrado en ningun parqueadero: ", Toast.LENGTH_SHORT).show();
+                }
             }
+
+
         }
 
         btncerrar.setOnClickListener{
@@ -178,9 +234,6 @@ class NotificationsFragment : Fragment() {
             startActivity(intent)
             context.finish()
         }
-
-
-
         return root
     }
 
