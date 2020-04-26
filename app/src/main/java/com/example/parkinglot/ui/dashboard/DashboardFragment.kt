@@ -48,55 +48,68 @@ class DashboardFragment : Fragment() {
         }
 
         root.bSearch.setOnClickListener { view ->
-            var editTextHello = root.findViewById(R.id.textInputEditText) as EditText
 
-            val connectivityManager= context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val networkInfo=connectivityManager.activeNetworkInfo
-
-            if(networkInfo!=null && networkInfo.isConnected)
+            val lfile4 = File("/data/user/0/com.example.parkinglot/files", "USERS.txt")
+            var username = "EMPTY"
+            lfile4.forEachLine {
+                username = it.split(";")[0]
+            }
+            if(!username.equals("EMPTY"))
             {
-                val docRef = database.collection("malls").document(editTextHello.text.toString())
+                var editTextHello = root.findViewById(R.id.textInputEditText) as EditText
 
-                docRef.get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
-                    if (task.isSuccessful)
-                    {
-                        val document = task.result?.toString()
-                        val out = task.result
-                        println (out)
-                        println (document)
+                val connectivityManager= context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val networkInfo=connectivityManager.activeNetworkInfo
 
-                        if (!document?.contains("doc=null")!!)
+                if(networkInfo!=null && networkInfo.isConnected)
+                {
+                    val docRef = database.collection("malls").document(editTextHello.text.toString())
+
+                    docRef.get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                        if (task.isSuccessful)
                         {
-                            Toast.makeText(getActivity(),"Se recibió el código!" + editTextHello.text, Toast.LENGTH_SHORT).show();
-                            val lfile = File(context?.getFilesDir(), "PARQUEADERO.txt")
-                            lfile.createNewFile()
-                            val lfilewriter = FileWriter(lfile)
-                            val lout = BufferedWriter(lfilewriter)
-                            lout.write(editTextHello.text.toString()+";"+ Calendar.getInstance().timeInMillis.toString())
-                            lout.close()
+                            val document = task.result?.toString()
+                            val out = task.result
+
+                            if (!document?.contains("doc=null")!!)
+                            {
+                                Toast.makeText(getActivity(),"Se recibió el código!" + editTextHello.text, Toast.LENGTH_SHORT).show();
+                                val lfile = File(context?.getFilesDir(), "PARQUEADERO.txt")
+                                lfile.createNewFile()
+                                val lfilewriter = FileWriter(lfile)
+                                val lout = BufferedWriter(lfilewriter)
+                                lout.write(editTextHello.text.toString()+";"+ Calendar.getInstance().timeInMillis.toString())
+                                lout.close()
+                            }
+                            else
+                            {
+                                Toast.makeText(getActivity(),"No existe el parqueadero: " + editTextHello.text, Toast.LENGTH_SHORT).show();
+                            }
                         }
                         else
                         {
-                            Toast.makeText(getActivity(),"No existe el parqueadero: " + editTextHello.text, Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "get failed with ", task.exception)
                         }
-                    }
-                    else
-                    {
-                        Log.d(TAG, "get failed with ", task.exception)
-                    }
-                })
+                    })
+                }
+                else
+                {
+                    Toast.makeText(getActivity(),"No hay internet!", Toast.LENGTH_SHORT).show();
+
+                    val lfile = File(context?.getFilesDir(), "PENDIENTEPARQUEADERO.txt")
+                    lfile.createNewFile()
+                    val lfilewriter = FileWriter(lfile)
+                    val lout = BufferedWriter(lfilewriter)
+                    lout.write(editTextHello.text.toString()+";"+java.util.Calendar.getInstance().timeInMillis.toString())
+                    lout.close()
+                }
             }
             else
             {
-                Toast.makeText(getActivity(),"No hay internet!", Toast.LENGTH_SHORT).show();
-
-                val lfile = File(context?.getFilesDir(), "PENDIENTEPARQUEADERO.txt")
-                lfile.createNewFile()
-                val lfilewriter = FileWriter(lfile)
-                val lout = BufferedWriter(lfilewriter)
-                lout.write(editTextHello.text.toString()+";"+java.util.Calendar.getInstance().timeInMillis.toString())
-                lout.close()
+                Toast.makeText(getActivity(),"PERMISO DENEGADO", Toast.LENGTH_SHORT).show();
             }
+
+
         }
     
         return root
