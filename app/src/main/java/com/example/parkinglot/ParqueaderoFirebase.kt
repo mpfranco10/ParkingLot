@@ -15,6 +15,8 @@ data class ParqueaderoFirebase(
     var address: String? = "",
     var parking_bike_cost: Int? = 0,
     var parking_car_cost: Int? = 0,
-    var parking_motorcycle_cost: Int? = 0
+    var parking_motorcycle_cost: Int? = 0,
+    var lat: Double?=0.0,
+    var long: Double?=0.0
 
 ) : Serializable
