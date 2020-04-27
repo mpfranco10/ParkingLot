@@ -1,6 +1,7 @@
 package com.example.parkinglot
 
 import android.content.ContentValues
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -28,6 +29,9 @@ class ParqueaderoActivity : AppCompatActivity() {
     val horai = ""
     val costopm = 0
     val apagar = 0
+
+    private var PRIVATE_MODE = 0
+    private val PREF_NAME = "esta_parqueado"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,6 +134,16 @@ class ParqueaderoActivity : AppCompatActivity() {
                                             val lout = BufferedWriter(lfilewriter)
                                             lout.write("EMPTY"+";"+"EMPTY")
                                             lout.close()
+
+                                            val sharedPref: SharedPreferences? = this.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
+                                            if (sharedPref != null) {
+                                                Log.d("shared", sharedPref.getString(PREF_NAME, "DEFAULT"))
+                                            }
+                                            val editor = sharedPref?.edit()
+                                            if (editor != null) {
+                                                editor.putString(PREF_NAME, "P")
+                                                editor.apply()
+                                            }
                                         }
                                         else
                                         {
