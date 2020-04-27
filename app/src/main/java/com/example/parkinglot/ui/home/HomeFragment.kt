@@ -1,11 +1,13 @@
 package com.example.parkinglot.ui.home
 
+import android.app.Activity
+import android.content.ContentValues
 import android.content.Context.CONNECTIVITY_SERVICE
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.MainActivity
+import com.example.parkinglot.ParqueaderoFirebase
 import com.example.parkinglot.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -23,6 +26,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 
 @Suppress("DEPRECATION")
@@ -135,6 +141,39 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
 
     private fun setUpMap() {
 
+        var sydney = LatLng(4.694836, -74.086209)
+        val db = FirebaseFirestore.getInstance()
+        // [END get_firestore_instance]
+        // [START set_firestore_settings]
+        val settings = FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(true)
+            .build()
+        db.firestoreSettings = settings
+        // [END set_firestore_settings]
+        // TODO: handle loggedInUser authentication
+        db.collection("malls")
+            .get()
+            .addOnSuccessListener { documents ->
+                if(documents.isEmpty){
+                    Log.w(ContentValues.TAG, "Error obteniendo parqueaderos de Firebase ")
+                }
+                else{
+                    for (document in documents) {
+                        val park: ParqueaderoFirebase = document.toObject(ParqueaderoFirebase::class.java)
+                        if(park.lat!=null && park.long!=null){
+                            sydney = LatLng(park.lat!!, park.long!!)
+                            map.addMarker(
+                                MarkerOptions().position(sydney)
+                                    .title(park.name)
+                            )
+                        }
+                    }
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+            }
     }
 
     override fun onMarkerClick(p0: Marker?) = false
