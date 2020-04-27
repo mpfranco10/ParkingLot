@@ -1,5 +1,6 @@
 package com.example.parkinglot.ui.parkinglots
 
+import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.*
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 class ParkinglotsFragment : Fragment() {
 
@@ -43,6 +46,11 @@ class ParkinglotsFragment : Fragment() {
         btnPrueba = root.findViewById(R.id.button2)
         btnPrueba2 = root.findViewById(R.id.button3)
 
+
+        btnPrueba.visibility =  View.GONE
+        btnPrueba2.visibility =  View.GONE
+
+
         val context = context as MainActivity
         btnPrueba2.setOnClickListener{
         val dbHandler = ParqueaderoOpenHelper(context, null)
@@ -74,8 +82,7 @@ class ParkinglotsFragment : Fragment() {
         lv = root.findViewById(R.id.listview) as ListView
         imageModelArrayList = populateList()
         Log.d("hjhjh", imageModelArrayList!!.size.toString() + "")
-        customeAdapter = CustomAdapter(context, imageModelArrayList!!)
-        lv!!.adapter = customeAdapter
+
 
 
         //val adapter = ArrayAdapter(context,  R.layout.simple_list_item_1 , arrayList)
@@ -89,14 +96,67 @@ class ParkinglotsFragment : Fragment() {
 
         val list = ArrayList<ImageModel>()
 
-        for (i in 0..4) {
-            val imageModel = ImageModel()
-            imageModel.setNames(myImageNameList[i])
-            imageModel.setImage_drawables(myImageList[i])
-            imageModel.setHorarios(myImageHorariosList[i])
-            imageModel.setPrecios(myImagePreciosList[i])
-            list.add(imageModel)
-        }
+
+        var imagenes: MutableList<Int> = ArrayList()
+        var nombres:MutableList<String> = ArrayList()
+        var precios:MutableList<String> = ArrayList()
+        var horarios:MutableList<String> = ArrayList()
+
+        val db = FirebaseFirestore.getInstance()
+        // [END get_firestore_instance]
+        // [START set_firestore_settings]
+        val settings = FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(true)
+            .build()
+        db.firestoreSettings = settings
+        // [END set_firestore_settings]
+        // TODO: handle loggedInUser authentication
+        db.collection("malls")
+            .get()
+            .addOnSuccessListener { documents ->
+                if(documents.isEmpty){
+                    Log.w(ContentValues.TAG, "Error obteniendo parqueaderos de Firebase ")
+                }
+                else{
+                    for (document in documents) {
+                        val park: ParqueaderoFirebase = document.toObject(ParqueaderoFirebase::class.java)
+                        if(park.name!=null){
+                            nombres.add(park.name.toString())
+                        }
+                        else{
+                            nombres.add("No nombre")
+                        }
+                        imagenes.add(R.mipmap.ic_park_a_foreground)
+                        if(park.address!=null){
+                            precios.add(park.address.toString())
+                        }
+                        else{
+                            nombres.add("No dirección")
+                        }
+                        horarios.add("horario")
+                        //myImagePreciosList.add(park.name.toString())
+                        //myImageHorariosList.add(park.name.toString())
+                    }
+
+                    for (i in 0 until nombres.size-1) {
+                        val imageModel = ImageModel()
+                        imageModel.setNames(nombres[i])
+                        imageModel.setImage_drawables(imagenes[i])
+                        imageModel.setHorarios(horarios[i])
+                        imageModel.setPrecios(precios[i])
+                        list.add(imageModel)
+                    }
+
+                    val context = context as MainActivity
+                    customeAdapter = CustomAdapter(context, list!!)
+                    lv!!.adapter = customeAdapter
+
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+            }
 
         return list
     }
