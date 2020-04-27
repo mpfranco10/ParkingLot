@@ -71,6 +71,7 @@ class DashboardFragment : Fragment() {
                     if (networkInfo != null && networkInfo.isConnected) {
                         val docRef =
                             database.collection("malls").document(editTextHello.text.toString())
+                        println("PASA POR ACA")
 
                         docRef.get()
                             .addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
