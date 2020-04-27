@@ -144,22 +144,87 @@ class DashboardFragment : Fragment() {
 
         //desactivamos los botones de buscar si ya está parqueado !!!
         val sharedPref: SharedPreferences? = activity?.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
+
+        println("corrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"+sharedPref?.getString(PREF_NAME, "DEFAULT"))
         if (sharedPref != null) {
 
             if ( sharedPref.getString(PREF_NAME, "DEFAULT").equals("P") ) { //si esta parqueado
                 root.bScan.isEnabled = false
+                root.bScan.visibility = View.GONE
                 root.bSearch.isEnabled = false
+                root.bSearch.visibility = View.GONE
+                root.buttonActual.isEnabled = true
                 root.buttonActual.visibility = View.VISIBLE
             }
             else if ( sharedPref.getString(PREF_NAME, "DEFAULT").equals("N") ) { //si esta parqueado
                 root.bScan.isEnabled = true
+                root.bScan.visibility = View.VISIBLE
                 root.bSearch.isEnabled = true
+                root.bSearch.visibility = View.VISIBLE
+                root.buttonActual.isEnabled = false
+                root.buttonActual.visibility = View.GONE
+            }
+            else
+            {
+                val editor = sharedPref?.edit()
+                if (editor != null) {
+                    editor.putString(PREF_NAME, "N")
+                    editor.apply()
+                }
+                root.bScan.isEnabled = true
+                root.bScan.visibility = View.VISIBLE
+                root.bSearch.isEnabled = true
+                root.bSearch.visibility = View.VISIBLE
+                root.buttonActual.isEnabled = false
                 root.buttonActual.visibility = View.GONE
             }
         }
+        else
+        {
+                Log.d("shared", sharedPref?.getString(PREF_NAME, "DEFAULT"))
+            val editor = sharedPref?.edit()
+            if (editor != null) {
+                editor.putString(PREF_NAME, "N")
+                editor.apply()
+            }
+            root.bScan.isEnabled = true
+            root.bScan.visibility = View.VISIBLE
+            root.bSearch.isEnabled = true
+            root.bSearch.visibility = View.VISIBLE
+            root.buttonActual.isEnabled = false
+            root.buttonActual.visibility = View.GONE
+        }
 
         root.buttonActual.setOnClickListener {
-            //mostrar la actividad, hay que mandarle el objeto que quieres mostrar
+            var databaseFinal = FirebaseFirestore.getInstance()
+
+            val lfile = File(context?.getFilesDir(), "PARQUEADERO.txt")
+            var result = ""
+            lfile.forEachLine {
+                result = it.split(";")[0]
+            }
+
+
+
+
+                val docRefFinal =
+                databaseFinal.collection("malls").document(result)
+
+            docRefFinal.get()
+                .addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                    if (task.isSuccessful) {
+                        val document = task.result?.toString()
+                        val out = task.result
+
+                        if (!document?.contains("doc=null")!!) {
+                            val note: ParqueaderoFirebase? = task.result!!.toObject(ParqueaderoFirebase::class.java)
+                            val intent = Intent(activity, ParqueaderoActivity::class.java)
+
+                            intent.putExtra("extra_object", note)
+                            startActivity(intent)
+                        }
+                    }
+                })
         }
     
         return root

@@ -141,7 +141,7 @@ class ParqueaderoActivity : AppCompatActivity() {
                                             }
                                             val editor = sharedPref?.edit()
                                             if (editor != null) {
-                                                editor.putString(PREF_NAME, "P")
+                                                editor.putString(PREF_NAME, "N")
                                                 editor.apply()
                                             }
                                         }
