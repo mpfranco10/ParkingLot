@@ -1,6 +1,7 @@
 package com.example.parkinglot.register.ui.register
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -18,7 +19,10 @@ import com.example.parkinglot.MainActivity
 import com.example.parkinglot.R
 import com.example.parkinglot.register.ui.register.LoggedInUserView
 import com.example.parkinglot.login.ui.login.LoginActivity
-
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import java.util.*
 
 
 class RegisterActivity : AppCompatActivity() {
@@ -74,16 +78,73 @@ class RegisterActivity : AppCompatActivity() {
         loginViewModel.loginResult.observe(this@RegisterActivity, Observer {
             val loginResult = it ?: return@Observer
 
-            loading.visibility = View.GONE
-            if (loginResult.error != null) {
-                showLoginFailed(loginResult.error)
-            }
-            if (loginResult.success != null) {
-                updateUiWithUser(loginResult.success)
-            }
-            setResult(Activity.RESULT_OK)
+            val username =  etusername.text.toString()
+            val password =etpassword.text.toString()
+            val phone = ettelefono.text.toString().toInt()
+            val firstname =etname.text.toString()
+            val lastname =etapellido.text.toString()
 
-            //Complete and destroy login activity once successful
+            loading.visibility = View.VISIBLE
+
+            val db = FirebaseFirestore.getInstance()
+            // [END get_firestore_instance]
+            // [START set_firestore_settings]
+            val settings = FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
+                .build()
+            db.firestoreSettings = settings
+
+            db.collection("users")
+                .whereEqualTo("username", username)
+                .get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents) {
+                        Log.d("loggeandoxd", "${document.id} => ${document.data}")
+                    }
+
+                    if(documents.isEmpty){
+
+                        val docData = hashMapOf(
+                            "firstname" to firstname,
+                            "lastname" to lastname,
+                            "phone_number" to phone,
+                            "birthday" to Timestamp(Date()),
+                            "gender" to 0,
+                            "saldo" to 10000,
+                            "username" to username,
+                            "password" to password
+                        )
+
+                        db.collection("users").document(username)
+                            .set(docData)
+                            .addOnSuccessListener {
+                                Log.d("Register", "DocumentSnapshot successfully written!")
+                                updateUiWithUser(username)
+                                setResult(Activity.RESULT_OK)
+
+                                //Complete and destroy login activity once successful
+                                finish()
+
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w("Register", "Error writing document", e)
+                                //no se pudo escribir
+                            }
+
+
+
+                    }
+                    else{
+                        Log.d("loggeandoxd", "no existe el user")
+                        showLoginFailed("Ya hay un usuario registrado con ese correo")
+                        loading.visibility = View.GONE
+                    }
+
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                }
+
 
         })
 
@@ -175,12 +236,15 @@ class RegisterActivity : AppCompatActivity() {
         }
 
 
-    private fun updateUiWithUser(model: LoggedInUserView) {
+    private fun updateUiWithUser(us: String) {
+
+
 
 
         val sharedPref: SharedPreferences = getSharedPreferences(PREF_NAME, PRIVATE_MODE)
         val editor = sharedPref.edit()
         editor.putBoolean(PREF_NAME, false)
+        editor.putString("username",us)
         editor.apply()
 
         val intent = Intent(this, MainActivity::class.java)
@@ -188,7 +252,7 @@ class RegisterActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun showLoginFailed(@StringRes errorString: Int) {
+    private fun showLoginFailed(errorString: String) {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
 }

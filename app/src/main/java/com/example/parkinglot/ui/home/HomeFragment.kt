@@ -60,7 +60,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
         if(!isNetwork()){
-           Toast.makeText(getActivity(),"No hay conexión a internet. Por favor conéctate para ver el mapa.", Toast.LENGTH_LONG).show();
+           Toast.makeText(getActivity(),"No hay conexión a internet para actualizar el mapa", Toast.LENGTH_LONG).show();
 
         }
 

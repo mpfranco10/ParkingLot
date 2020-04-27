@@ -1,6 +1,7 @@
 package com.example.parkinglot.login.ui.login
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.lifecycle.Observer
@@ -10,6 +11,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -19,6 +21,8 @@ import android.widget.Toast
 import com.example.parkinglot.MainActivity
 import com.example.parkinglot.R
 import com.example.parkinglot.register.ui.register.RegisterActivity
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 class LoginActivity : AppCompatActivity() {
 
@@ -57,17 +61,49 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel.loginResult.observe(this@LoginActivity, Observer {
             val loginResult = it ?: return@Observer
 
-            loading.visibility = View.GONE
-            if (loginResult.error != null) {
-                showLoginFailed(loginResult.error)
-            }
-            if (loginResult.success != null) {
-                updateUiWithUser(loginResult.success)
-            }
-            setResult(Activity.RESULT_OK)
+            val us = username.text.toString()
+            val pas = password.text.toString()
 
-            //Complete and destroy login activity once successful
-            finish()
+            loading.visibility = View.VISIBLE
+
+            val db = FirebaseFirestore.getInstance()
+            // [END get_firestore_instance]
+            // [START set_firestore_settings]
+            val settings = FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
+                .build()
+            db.firestoreSettings = settings
+            // [END set_firestore_settings]
+            // TODO: handle loggedInUser authentication
+            db.collection("users")
+                .whereEqualTo("username", us)
+                .whereEqualTo("password", pas)
+                .get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents) {
+                        Log.d("loggeandoxd", "${document.id} => ${document.data}")
+                    }
+
+                    if(documents.isEmpty){
+                        Log.d("loggeandoxd", "no existe el user")
+                        showLoginFailed("Usuario y/o contraseña no válida")
+                        loading.visibility = View.GONE
+                    }
+                    else{
+                        updateUiWithUser(us)
+                        setResult(Activity.RESULT_OK)
+
+                        //Complete and destroy login activity once successful
+                        finish()
+                    }
+
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                }
+
+
+
         })
 
         username.afterTextChanged {
@@ -111,13 +147,14 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUiWithUser(model: LoggedInUserView) {
+    private fun updateUiWithUser(userna: String) {
         val welcome = getString(R.string.welcome)
-        val displayName = model.displayName
+        val displayName = userna
 
         val sharedPref: SharedPreferences = getSharedPreferences(PREF_NAME, PRIVATE_MODE)
         val editor = sharedPref.edit()
         editor.putBoolean(PREF_NAME, false)
+        editor.putString("username",userna)
         editor.apply()
 
         val intent = Intent(this, MainActivity::class.java)
@@ -125,7 +162,7 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun showLoginFailed(@StringRes errorString: Int) {
+    private fun showLoginFailed(errorString: String) {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
 }
