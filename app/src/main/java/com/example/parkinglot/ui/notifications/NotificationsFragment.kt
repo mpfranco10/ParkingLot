@@ -60,6 +60,8 @@ class NotificationsFragment : Fragment() {
         val btnPrueba: Button = root.findViewById(R.id.boton_park)
         val btncerrar: Button = root.findViewById(R.id.bClose)
         val db = FirebaseFirestore.getInstance()
+
+
         // [END get_firestore_instance]
 
         var perfil = ""

@@ -38,8 +38,6 @@ class MainActivity : AppCompatActivity() {
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
-        tvresult = findViewById<TextView>(R.id.tvresult)
-
         val navController = findNavController(R.id.nav_host_fragment)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
@@ -138,11 +136,6 @@ class MainActivity : AppCompatActivity() {
             corruptedZoomTables.delete()
             googleBug.edit().putBoolean("fixed", true).apply()
         }
-    }
-
-    companion object {
-
-        var tvresult: TextView? = null
     }
 
     fun escanear(view: View) {}

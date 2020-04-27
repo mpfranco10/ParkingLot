@@ -7,12 +7,13 @@
     android:background="@color/colorPrimary"
     android:backgroundTint="#FFFFFF"
     android:fontFamily="sans-serif-medium"
-    tools:context=".ui.dashboard.DashboardFragment">
+    tools:context=".ui.dashboard.DashboardFragment"
+    tools:visibility="visible">
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="352dp"
+        android:layout_height="55dp"
         android:layout_marginStart="32dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/title_search"
@@ -20,9 +21,10 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.235" />
+        app:layout_constraintVertical_bias="0.091" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"
@@ -39,22 +41,21 @@
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/textInputEditText"
-        android:layout_width="315dp"
-        android:layout_height="48dp"
+        android:layout_width="352dp"
+        android:layout_height="43dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:hint="Ej: A87D6"
         android:textColor="@color/colorPrimaryDark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.58"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.089" />
+        app:layout_constraintVertical_bias="0.029" />
 
     <Button
         android:id="@+id/bSearch"
-        android:layout_width="196dp"
+        android:layout_width="352dp"
         android:layout_height="63dp"
         android:backgroundTint="@color/colorPrimary"
         android:drawableLeft="@drawable/ic_send_black_24dp"
@@ -67,11 +68,11 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputEditText"
-        app:layout_constraintVertical_bias="0.138" />
+        app:layout_constraintVertical_bias="0.042" />
 
     <Button
         android:id="@+id/bScan"
-        android:layout_width="196dp"
+        android:layout_width="352dp"
         android:layout_height="63dp"
         android:backgroundTint="@color/colorPrimary"
         android:drawableLeft="@drawable/ic_camera_alt_black_24dp"
@@ -84,19 +85,41 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bSearch"
-        app:layout_constraintVertical_bias="0.08" />
+        app:layout_constraintVertical_bias="0.029" />
 
     <TextView
-        android:id="@+id/tvresult"
-        android:layout_width="191dp"
-        android:layout_height="77dp"
-        android:layout_marginTop="35dp"
-        android:text="TextView"
+        android:id="@+id/textViewActual"
+        android:layout_width="352dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="292dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Parqueadero"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.559"
+        app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bScan"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/bScan" />
+
+    <Button
+        android:id="@+id/buttonActual"
+        android:layout_width="352dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="34dp"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:fontFamily="sans-serif-medium"
+        android:padding="16dp"
+        android:text="Ver mi estado de parqueo"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewActual"
+        app:layout_constraintVertical_bias="0.04" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

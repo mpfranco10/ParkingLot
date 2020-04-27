@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context=".ParqueaderoActivity">
+
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="250dp"
+        android:stretchColumns="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="409dp"
+        android:layout_height="491dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.025">
+
+        <TableRow>
+
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:padding="3dip"
+                android:paddingBottom="60dip"
+                android:text="Parqueadero   "
+                android:textColor="@color/colorPrimary"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_gravity="left"
+                android:id="@+id/tvParqueadero"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="right"
+                android:padding="3dip"
+                android:text="Nombre"
+                android:textColor="#000000"
+                android:textSize="25sp" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:padding="3dip"
+                android:paddingBottom="60dip"
+                android:text="Abierto desde  "
+                android:textColor="@color/colorPrimary"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="right"
+                android:padding="3dip"
+                android:text="Hora1"
+                android:id="@+id/tvAbiertodesde"
+                android:textColor="#000000"
+                android:textSize="25sp" />
+        </TableRow>
+
+
+        <TableRow>
+
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:padding="3dip"
+                android:paddingBottom="60dip"
+                android:text="Abierto hasta  "
+                android:textColor="@color/colorPrimary"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="right"
+                android:padding="3dip"
+                android:text="Hora2"
+                android:id="@+id/tvAbiertohasta"
+                android:textColor="#000000"
+                android:textSize="25sp" />
+        </TableRow>
+
+
+        <TableRow>
+
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:padding="3dip"
+                android:paddingBottom="60dip"
+                android:text="Hora inicio  "
+                android:textColor="@color/colorPrimary"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="right"
+                android:padding="3dip"
+                android:text="Hora1"
+                android:id="@+id/tvHorain"
+                android:textColor="#000000"
+                android:textSize="25sp" />
+        </TableRow>
+
+
+        <TableRow>
+
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:padding="3dip"
+                android:paddingBottom="60dip"
+                android:text="Costo por min  "
+                android:textColor="@color/colorPrimary"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="right"
+                android:padding="3dip"
+                android:text="Costo"
+                android:id="@+id/tvCostoxmin"
+                android:textColor="#000000"
+                android:textSize="25sp" />
+        </TableRow>
+
+
+        <TableRow>
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:padding="3dip"
+                android:paddingBottom="60dip"
+                android:text="A pagar hasta el momento  "
+                android:textColor="@color/colorPrimary"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="right"
+                android:padding="3dip"
+                android:text="Costo"
+                android:id="@+id/tvApagar"
+                android:textColor="#000000"
+                android:textSize="25sp" />
+        </TableRow>
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/buttonPagoon"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:fontFamily="sans-serif-medium"
+        android:padding="16dp"
+        android:text="Pagar en línea"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
+
+    <Button
+        android:id="@+id/buttonIngresarcod"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="19dp"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:fontFamily="sans-serif-medium"
+        android:padding="16dp"
+        android:text="Ingresar código de pago"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonPagoon"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/buttonBack"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:backgroundTint="#2196F3"
+        android:fontFamily="sans-serif-medium"
+        android:padding="16dp"
+        android:text="Volver"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonIngresarcod"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

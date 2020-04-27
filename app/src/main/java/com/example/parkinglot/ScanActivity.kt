@@ -3,6 +3,7 @@ package com.example.parkinglot
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
@@ -16,7 +17,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.zxing.BarcodeFormat
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import com.google.zxing.Result
@@ -25,6 +29,9 @@ import com.google.zxing.Result
  * Created by Parsania Hardik on 19-Mar-18.
  */
 class ScanActivity : AppCompatActivity(), ZXingScannerView.ResultHandler {
+
+    private var PRIVATE_MODE = 0
+    private val PREF_NAME = "esta_parqueado"
 
     companion object {
         private const val HUAWEI = "huawei"
@@ -123,9 +130,54 @@ class ScanActivity : AppCompatActivity(), ZXingScannerView.ResultHandler {
     }
 
     override fun handleResult(p0: Result?) {
-        if (p0 != null) {
-            Toast.makeText(this, p0.text, Toast.LENGTH_LONG).show()
-        }
-        onBackPressed()
-    }
+        if(p0!=null){
+        val result = p0.text
+
+        var database = FirebaseFirestore.getInstance()
+            val docRef =
+                database.collection("malls").document(result)
+
+            docRef.get()
+                .addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                    if (task.isSuccessful) {
+                        val document = task.result?.toString()
+                        val out = task.result
+
+                        if (!document?.contains("doc=null")!!) {
+
+                            //CREAR un objeto a partir de la bD de firebase
+                            val note: ParqueaderoFirebase? = task.result!!.toObject(ParqueaderoFirebase::class.java)
+
+
+                            val sharedPref: SharedPreferences? = getSharedPreferences(PREF_NAME, PRIVATE_MODE)
+                            if (sharedPref != null) {
+                                Log.d("shared", sharedPref.getString(PREF_NAME, "DEFAULT"))
+                            }
+                            val editor = sharedPref?.edit()
+                            if (editor != null) {
+                                editor.putString(PREF_NAME, "P")
+                                editor.apply()
+                            }
+
+                            //se lo mandamos a la otra actividad para que lo muestre
+                            val intent = Intent(this@ScanActivity, ParqueaderoActivity::class.java)
+                            intent.putExtra("extra_object", note)
+                            startActivity(intent)
+                        } else {
+                            Toast.makeText(
+                                this@ScanActivity,
+                                "No existe el parqueadero: " + result,
+                                Toast.LENGTH_SHORT
+                            ).show();
+                            onBackPressed()
+                        }
+                    } else {
+                        Log.d("Fallo QR", "get failed with ", task.exception)
+                        onBackPressed()
+                    }
+                })
+
+
+
+    }}
 }

@@ -19,7 +19,7 @@ class EntryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val sharedPref: SharedPreferences = getSharedPreferences(PREF_NAME, PRIVATE_MODE)
-        Log.d("myTag", sharedPref.getBoolean(PREF_NAME, false).toString());
+        Log.d("myTag", sharedPref.getBoolean(PREF_NAME, false).toString())
         if (sharedPref.getBoolean(PREF_NAME, true)) { //si no se ha logeado lo lleva a la pantalla de log
             val homeIntent = Intent(this, LoginActivity::class.java)
             startActivity(homeIntent)
