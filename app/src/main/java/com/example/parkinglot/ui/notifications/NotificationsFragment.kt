@@ -144,6 +144,14 @@ class NotificationsFragment : Fragment() {
                 editor.putBoolean(PREF_NAME, true)
                 editor.apply()
             }
+
+            val sharedPref2: SharedPreferences? =
+                activity?.getSharedPreferences("esta_parqueado", PRIVATE_MODE)
+            val editor2 = sharedPref?.edit()
+            if (editor2 != null) {
+                editor2.putString(PREF_NAME, "N")
+                editor2.apply()
+            }
             val intent = Intent(context, LoginActivity::class.java)
             startActivity(intent)
             context.finish()

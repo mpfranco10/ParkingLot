@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.ConnectivityManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -15,6 +16,7 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnCompleteListener
@@ -24,6 +26,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.zxing.BarcodeFormat
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import com.google.zxing.Result
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 /**
  * Created by Parsania Hardik on 19-Mar-18.
@@ -129,55 +137,90 @@ class ScanActivity : AppCompatActivity(), ZXingScannerView.ResultHandler {
         qrCodeScanner.stopCamera()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun handleResult(p0: Result?) {
         if(p0!=null){
         val result = p0.text
+            var database = FirebaseFirestore.getInstance()
 
-        var database = FirebaseFirestore.getInstance()
-            val docRef =
-                database.collection("malls").document(result)
+                val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val networkInfo = connectivityManager.activeNetworkInfo
 
-            docRef.get()
-                .addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
-                    if (task.isSuccessful) {
-                        val document = task.result?.toString()
-                        val out = task.result
+                if (networkInfo != null && networkInfo.isConnected) {
+                    val docRef =
+                        database.collection("malls").document(result)
 
-                        if (!document?.contains("doc=null")!!) {
+                    docRef.get()
+                        .addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                            if (task.isSuccessful) {
+                                val document = task.result?.toString()
+                                val out = task.result
 
-                            //CREAR un objeto a partir de la bD de firebase
-                            val note: ParqueaderoFirebase? = task.result!!.toObject(ParqueaderoFirebase::class.java)
+                                if (!document?.contains("doc=null")!!) {
+
+                                    //CREAR un objeto a partir de la bD de firebase
+                                    val note: ParqueaderoFirebase? = task.result!!.toObject(ParqueaderoFirebase::class.java)
+
+                                    val currentDateTime = LocalDateTime.now()
+                                    val horaactual= currentDateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+
+                                    //ponemos en las sharedpreferences la P de PARQUEADO
+                                    val sharedPref: SharedPreferences? = getSharedPreferences(PREF_NAME, PRIVATE_MODE)
+                                    if (sharedPref != null) {
+                                        Log.d("shared", sharedPref.getString(PREF_NAME, "DEFAULT"))
+                                    }
+                                    val editor = sharedPref?.edit()
+                                    if (editor != null) {
+                                        editor.putString(PREF_NAME, "P")
+                                        editor.putString("hora_parqueo",horaactual)
+                                        editor.apply()
+                                    }
 
 
-                            val sharedPref: SharedPreferences? = getSharedPreferences(PREF_NAME, PRIVATE_MODE)
-                            if (sharedPref != null) {
-                                Log.d("shared", sharedPref.getString(PREF_NAME, "DEFAULT"))
+
+                                    val lfile = File(getFilesDir(), "PARQUEADERO.txt")
+                                    lfile.createNewFile()
+                                    val lfilewriter = FileWriter(lfile)
+                                    val lout = BufferedWriter(lfilewriter)
+                                    lout.write(result+ ";" + Calendar.getInstance().timeInMillis.toString())
+                                    lout.close()
+
+
+
+
+                                    //se lo mandamos a la otra actividad para que lo muestre
+                                    val intent = Intent(this@ScanActivity, ParqueaderoActivity::class.java)
+                                    intent.putExtra("extra_object", note)
+                                    intent.putExtra("hora", horaactual)
+                                    startActivity(intent)
+                                    finish()
+                                } else {
+                                    Toast.makeText(
+                                        this@ScanActivity,
+                                        "No existe el parqueadero: " + result,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    finish()
+                                }
+                            } else {
+                                Log.d("fail", "get failed with ", task.exception)
+                                finish()
                             }
-                            val editor = sharedPref?.edit()
-                            if (editor != null) {
-                                editor.putString(PREF_NAME, "P")
-                                editor.apply()
-                            }
+                        })
+                } else {
+                    Toast.makeText(this@ScanActivity, "No hay internet!", Toast.LENGTH_SHORT)
+                        .show();
 
-                            //se lo mandamos a la otra actividad para que lo muestre
-                            val intent = Intent(this@ScanActivity, ParqueaderoActivity::class.java)
-                            intent.putExtra("extra_object", note)
-                            startActivity(intent)
-                        } else {
-                            Toast.makeText(
-                                this@ScanActivity,
-                                "No existe el parqueadero: " + result,
-                                Toast.LENGTH_SHORT
-                            ).show();
-                            onBackPressed()
-                        }
-                    } else {
-                        Log.d("Fallo QR", "get failed with ", task.exception)
-                        onBackPressed()
-                    }
-                })
+                    val lfile = File(getFilesDir(), "PENDIENTEPARQUEADERO.txt")
+                    lfile.createNewFile()
+                    val lfilewriter = FileWriter(lfile)
+                    val lout = BufferedWriter(lfilewriter)
+                    lout.write(result + ";" + java.util.Calendar.getInstance().timeInMillis.toString())
+                    lout.close()
+                    finish()
+                }
 
+            }
+    }
 
-
-    }}
 }
