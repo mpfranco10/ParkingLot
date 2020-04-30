@@ -5,13 +5,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.ParqueaderoActivity
@@ -25,6 +29,8 @@ import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -33,7 +39,12 @@ class DashboardFragment : Fragment() {
     private lateinit var dashboardViewModel: DashboardViewModel
     private var PRIVATE_MODE = 0
     private val PREF_NAME = "esta_parqueado"
+    private var btnscan: Button? = null
+    private var btnCode: Button? = null
+    private var btnVer: Button? = null
 
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -42,6 +53,10 @@ class DashboardFragment : Fragment() {
         dashboardViewModel =
                 ViewModelProviders.of(this).get(DashboardViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_dashboard, container, false)
+
+        btnscan = root.findViewById<Button>(R.id.bScan)
+        btnCode = root.findViewById<Button>(R.id.bSearch)
+        btnVer = root.findViewById<Button>(R.id.buttonActual)
 
         var database = FirebaseFirestore.getInstance()
 
@@ -71,7 +86,6 @@ class DashboardFragment : Fragment() {
                     if (networkInfo != null && networkInfo.isConnected) {
                         val docRef =
                             database.collection("malls").document(editTextHello.text.toString())
-                        println("PASA POR ACA")
 
                         docRef.get()
                             .addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
@@ -84,6 +98,9 @@ class DashboardFragment : Fragment() {
                                         //CREAR un objeto a partir de la bD de firebase
                                         val note: ParqueaderoFirebase? = task.result!!.toObject(ParqueaderoFirebase::class.java)
 
+                                        val currentDateTime = LocalDateTime.now()
+                                        val horaactual= currentDateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+
                                         //ponemos en las sharedpreferences la P de PARQUEADO
                                         val sharedPref: SharedPreferences? = activity?.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
                                         if (sharedPref != null) {
@@ -92,6 +109,7 @@ class DashboardFragment : Fragment() {
                                         val editor = sharedPref?.edit()
                                         if (editor != null) {
                                             editor.putString(PREF_NAME, "P")
+                                            editor.putString("hora_parqueo",horaactual)
                                             editor.apply()
                                         }
 
@@ -104,9 +122,13 @@ class DashboardFragment : Fragment() {
                                         lout.write(editTextHello.text.toString() + ";" + Calendar.getInstance().timeInMillis.toString())
                                         lout.close()
 
+
+
+
                                         //se lo mandamos a la otra actividad para que lo muestre
                                         val intent = Intent(activity, ParqueaderoActivity::class.java)
                                         intent.putExtra("extra_object", note)
+                                        intent.putExtra("hora", horaactual)
                                         startActivity(intent)
                                     } else {
                                         Toast.makeText(
@@ -150,9 +172,9 @@ class DashboardFragment : Fragment() {
 
             if ( sharedPref.getString(PREF_NAME, "DEFAULT").equals("P") ) { //si esta parqueado
                 root.bScan.isEnabled = false
-                root.bScan.visibility = View.GONE
+                root.bScan.visibility = GONE
                 root.bSearch.isEnabled = false
-                root.bSearch.visibility = View.GONE
+                root.bSearch.visibility = GONE
                 root.buttonActual.isEnabled = true
                 root.buttonActual.visibility = View.VISIBLE
             }
@@ -162,7 +184,7 @@ class DashboardFragment : Fragment() {
                 root.bSearch.isEnabled = true
                 root.bSearch.visibility = View.VISIBLE
                 root.buttonActual.isEnabled = false
-                root.buttonActual.visibility = View.GONE
+                root.buttonActual.visibility = GONE
             }
             else
             {
@@ -176,7 +198,7 @@ class DashboardFragment : Fragment() {
                 root.bSearch.isEnabled = true
                 root.bSearch.visibility = View.VISIBLE
                 root.buttonActual.isEnabled = false
-                root.buttonActual.visibility = View.GONE
+                root.buttonActual.visibility = GONE
             }
         }
         else
@@ -192,7 +214,7 @@ class DashboardFragment : Fragment() {
             root.bSearch.isEnabled = true
             root.bSearch.visibility = View.VISIBLE
             root.buttonActual.isEnabled = false
-            root.buttonActual.visibility = View.GONE
+            root.buttonActual.visibility = GONE
         }
 
         root.buttonActual.setOnClickListener {
@@ -220,7 +242,9 @@ class DashboardFragment : Fragment() {
                             val note: ParqueaderoFirebase? = task.result!!.toObject(ParqueaderoFirebase::class.java)
                             val intent = Intent(activity, ParqueaderoActivity::class.java)
 
+
                             intent.putExtra("extra_object", note)
+                            intent.putExtra("hora", "na")
                             startActivity(intent)
                         }
                     }
@@ -229,4 +253,33 @@ class DashboardFragment : Fragment() {
     
         return root
     }
+
+    override fun onResume(){
+        super.onResume()
+
+
+
+        val sharedPref: SharedPreferences? = activity?.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
+        if (sharedPref != null) {
+
+            if ( sharedPref.getString(PREF_NAME, "DEFAULT").equals("P") ) { //si esta parqueado
+                btnscan?.isEnabled = false
+                btnscan?.visibility = GONE
+                btnCode?.isEnabled = false
+                btnCode?.visibility = GONE
+                btnVer?.isEnabled = true
+                btnVer?.visibility = View.VISIBLE
+            }
+            else if ( sharedPref.getString(PREF_NAME, "DEFAULT").equals("N") ) { //si esta parqueado
+                btnscan?.isEnabled = true
+                btnscan?.visibility = View.VISIBLE
+                btnCode?.isEnabled = true
+                btnCode?.visibility = View.VISIBLE
+                btnVer?.isEnabled = false
+                btnVer?.visibility = GONE
+            }
+        }
+    }
+
+
 }

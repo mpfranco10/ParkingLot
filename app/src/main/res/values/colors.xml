@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#425882</color>
-    <color name="colorPrimaryDark">#364156</color>
-    <color name="colorAccent">#98add6</color>
+    <color name="colorPrimary">#007EA8</color>
+    <color name="colorPrimaryDark">#007EA8</color>
+    <color name="colorAccent">#8FE587</color>
+    <color name="aguamar">#00A5B5</color>
+    <color name="aguamarclaro">#00C8A6</color>
+    <color name="amarillo">#F9F871</color>
     <color name="textColorPrimary">#ffffff</color>
+    <color name="grey">#E3F0FF</color>
+
+    <color name="startblue">#4190EA</color>
+
+    <color name="endblue">#9CC1EB</color>
+    <!--colors for profile-->
 </resources>

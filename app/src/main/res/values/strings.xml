@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Carnest</string>
     <string name="title_home">Mapa</string>
-    <string name="title_dashboard">Parquear</string>
+    <string name="title_dashboard">Seguimiento</string>
     <string name="title_notifications">Perfil</string>
     <string name="title_parkinglots">Parqueaderos</string>
     <string name="title_search">Ingrese el código del parqueadero manualmente</string>
