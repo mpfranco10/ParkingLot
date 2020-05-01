@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
  */
 class LoginDataSource {
 
-    fun login(username: String, password: String, phone: Int, firstname: String, lastname: String): Result<LoggedInUser> {
+    fun login(username: String, password: String, phone: Long, firstname: String, lastname: String): Result<LoggedInUser> {
 
         try {
             val fakeUser = LoggedInUser(java.util.UUID.randomUUID().toString(), firstname)

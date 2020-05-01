@@ -80,7 +80,7 @@ class RegisterActivity : AppCompatActivity() {
 
             val username =  etusername.text.toString()
             val password =etpassword.text.toString()
-            val phone = ettelefono.text.toString().toInt()
+            val phone = ettelefono.text.toString().toLong()
             val firstname =etname.text.toString()
             val lastname =etapellido.text.toString()
 
@@ -209,7 +209,7 @@ class RegisterActivity : AppCompatActivity() {
                         loginViewModel.login(
                             etusername.text.toString(),
                             etpassword.text.toString(),
-                            ettelefono.text.toString().toInt(),
+                            ettelefono.text.toString().toLong(),
                             etname.text.toString(),
                             etapellido.text.toString()
                         )
@@ -221,7 +221,7 @@ class RegisterActivity : AppCompatActivity() {
                 loading.visibility = View.VISIBLE
                 loginViewModel.login(etusername.text.toString(),
                     etpassword.text.toString(),
-                    ettelefono.text.toString().toInt(),
+                    ettelefono.text.toString().toLong(),
                     etname.text.toString(),
                     etapellido.text.toString())
             }
@@ -237,9 +237,6 @@ class RegisterActivity : AppCompatActivity() {
 
 
     private fun updateUiWithUser(us: String) {
-
-
-
 
         val sharedPref: SharedPreferences = getSharedPreferences(PREF_NAME, PRIVATE_MODE)
         val editor = sharedPref.edit()
