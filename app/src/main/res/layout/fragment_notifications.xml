@@ -10,9 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#E3F0FF"
-        android:orientation="vertical"
         android:fontFamily="sans-serif-medium"
-        tools:context="com.example.parkinglot.ProfileActivity">
+        android:orientation="vertical"
+        tools:context="com.example.parkinglot.ProfileActivity"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-58dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -20,7 +22,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="290dp"
+                android:layout_height="120dp"
                 android:background="@drawable/gradientbackground"
                 android:orientation="vertical">
 
@@ -28,7 +30,7 @@
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="45dp"
+                    android:layout_marginTop="-5dp"
                     android:src="@drawable/ic_person_black_24dp" />
 
                 <TextView
@@ -36,7 +38,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="-15dp"
                     android:text="Nombre"
                     android:textColor="#fff"
                     android:textSize="21sp"
@@ -45,9 +47,9 @@
 
             <androidx.cardview.widget.CardView
                 android:layout_width="400dp"
-                android:layout_height="120dp"
+                android:layout_height="160px"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="230dp">
+                android:layout_marginTop="140dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -72,7 +74,7 @@
                             android:id="@+id/tv_saldo"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="10dp"
+                            android:paddingTop="0dp"
                             android:text="0"
                             android:textColor="@color/startblue"
                             android:textSize="20sp"
@@ -87,7 +89,7 @@
             android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="0dp"
+            android:layout_marginTop="-140dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -115,7 +117,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="0dp"
                 android:orientation="horizontal"
                 android:paddingLeft="25dp">
 
@@ -125,32 +127,32 @@
                     android:src="@drawable/ic_local_phone_black_24dp" />
 
                 <TextView
+                    android:id="@+id/text_edad2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:paddingLeft="20dp"
-                    android:id="@+id/text_edad2"
                     android:text="tel"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 
         <Button
+            android:id="@+id/bRecargar"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:id="@+id/bRecargar"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="15dp"
             android:background="@drawable/buttonstyle"
             android:text="Recargar saldo"
             android:textColor="#fff" />
 
         <Button
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
             android:id="@+id/bClose"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
             android:background="@drawable/buttonstyle"
             android:text="Cerrar sesión"
             android:textColor="#fff" />
