@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -34,6 +35,7 @@ class ParqueaderoActivity : AppCompatActivity() {
     val horai = ""
     val costopm = 0
     val apagar = 0
+    var count = 0
 
     private var PRIVATE_MODE = 0
     private val PREF_NAME = "esta_parqueado"
@@ -43,25 +45,32 @@ class ParqueaderoActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_parqueadero)
 
         val obj: ParqueaderoFirebase =
             intent.getSerializableExtra("extra_object") as ParqueaderoFirebase
         val hora: String = intent.getSerializableExtra("hora") as String
 
-
         costo = obj.parking_car_cost!!
         Log.d("boredyet", hora)
 
-        val currentDateTime = LocalDateTime.now()
-        val horaactual= currentDateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+        var horaactual = ""
+        var calendar = Calendar.getInstance()
+        var hour12hrs = calendar.get(Calendar.HOUR)
+        var minutes = calendar.get(Calendar.MINUTE)
+        var seconds = calendar.get(Calendar.SECOND)
+        horaactual = hour12hrs.toString() + ":" + minutes.toString() + ":" + seconds.toString()
 
-        val tvpark = findViewById<View>(R.id.tvParqueadero) as TextView
-        val tvabiertodesde = findViewById<View>(R.id.tvAbiertodesde) as TextView
-        val tvabiertohasta = findViewById<View>(R.id.tvAbiertohasta) as TextView
-        val tvhorain = findViewById<View>(R.id.tvHorain) as TextView
-        val tvcostomin = findViewById<View>(R.id.tvCostoxmin) as TextView
-        val tvapagar = findViewById<View>(R.id.tvApagar) as TextView
+        //val currentDateTime = LocalDateTime.now()
+        //val horaactual= currentDateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+        var tvapagar = findViewById<View>(R.id.tvApagar) as TextView
+
+        var tvpark = findViewById<View>(R.id.tvParqueadero) as TextView
+        var tvabiertodesde = findViewById<View>(R.id.tvAbiertodesde) as TextView
+        var tvabiertohasta = findViewById<View>(R.id.tvAbiertohasta) as TextView
+        var tvhorain = findViewById<View>(R.id.tvHorain) as TextView
+        var tvcostomin = findViewById<View>(R.id.tvCostoxmin) as TextView
         var database = FirebaseFirestore.getInstance()
 
         val btnVolver = findViewById<View>(R.id.buttonBack) as Button
@@ -76,14 +85,15 @@ class ParqueaderoActivity : AppCompatActivity() {
             id = it.split(";")[0]
         }
 
-        var units = (java.util.Calendar.getInstance().timeInMillis.toDouble()-date.toDouble())/3600000
-        var unitsResp = (units* obj.parking_car_cost!!).roundToInt()
+        var units =
+            (java.util.Calendar.getInstance().timeInMillis.toDouble() - date.toDouble()) / 3600000
+        var unitsResp = (units * obj.parking_car_cost!!).roundToInt()
 
         if (obj != null) {
             tvpark.text = obj.name
-            tvabiertodesde.text  = obj.opening_hour
+            tvabiertodesde.text = obj.opening_hour
             tvabiertohasta.text = obj.closing_hour
-            if(hora!="na") {
+            if (hora != "na") {
                 tvhorain.text = hora
 
                 val t1 = horaactual.split(":")
@@ -95,16 +105,14 @@ class ParqueaderoActivity : AppCompatActivity() {
                 val h2 = t2[0].toInt()
                 val m2 = t2[1].toInt()
 
-                val diffho = h1-h2
+                val diffho = h1 - h2
                 val diffmin = m1 - m2
-                val tot = 60*diffho + diffmin
+                val tot = 60 * diffho + diffmin
 
-
-                cuantopaga = tot*costo
+                cuantopaga = tot * costo
                 tvapagar.text = cuantopaga.toString()
 
-            }
-            else{
+            } else {
 
                 val sharedPref: SharedPreferences? = getSharedPreferences(PREF_NAME, PRIVATE_MODE)
                 if (sharedPref != null) {
@@ -121,103 +129,211 @@ class ParqueaderoActivity : AppCompatActivity() {
                     val h2 = t2?.get(0)?.toInt()
                     val m2 = t2?.get(1)?.toInt()
 
-                    val diffho = h1- h2!!
+                    val diffho = h1 - h2!!
                     val diffmin = m1 - m2!!
-                    val tot = 60*diffho + diffmin
+                    val tot = 60 * diffho + diffmin
 
 
-                    cuantopaga = tot*costo
+                    cuantopaga = tot * costo
                     tvapagar.text = cuantopaga.toString()
 
-                    }
+                }
             }
 
             val sdf = SimpleDateFormat("MM/dd/yyyy")
             val netDate = Date(date.toLong())
-
-
-
             tvcostomin.text = obj.parking_car_cost.toString()
 
-        }
+            var t = Thread() {
+                    println("lol")
+                    while (true) {
+                        Thread.sleep(60000)
+                        runOnUiThread(Runnable() {
+                                count++
 
-        btnVolver.setOnClickListener {
-            onBackPressed()
-        }
+                                calendar = Calendar.getInstance()
+                                hour12hrs = calendar.get(Calendar.HOUR)
+                                minutes = calendar.get(Calendar.MINUTE)
+                                seconds = calendar.get(Calendar.SECOND)
+                                horaactual =
+                                    hour12hrs.toString() + ":" + minutes.toString() + ":" + seconds.toString()
 
-        btnOnline.setOnClickListener {
-            //dbHandler.addName(user)
-            var units = (java.util.Calendar.getInstance().timeInMillis.toDouble()-date.toDouble())/3600000
+                                tvapagar = findViewById<View>(R.id.tvApagar) as TextView
 
-            val sharedPref: SharedPreferences? = getSharedPreferences("alreadylogged", PRIVATE_MODE)
-            val guser = sharedPref?.getString("username", "DEFAULT")
-            val nuser = guser.toString()
+                                tvpark = findViewById<View>(R.id.tvParqueadero) as TextView
+                                tvabiertodesde =
+                                    findViewById<View>(R.id.tvAbiertodesde) as TextView
+                                tvabiertohasta =
+                                    findViewById<View>(R.id.tvAbiertohasta) as TextView
+                                tvhorain = findViewById<View>(R.id.tvHorain) as TextView
+                                tvcostomin = findViewById<View>(R.id.tvCostoxmin) as TextView
 
-                            val docRef2 = database.collection("users").document(nuser)
+                                val lfile = File(getFilesDir(), "PARQUEADERO.txt")
+                                var date = ""
+                                var id = ""
+                                lfile.forEachLine {
+                                    date = it.split(";")[1]
+                                    id = it.split(";")[0]
+                                }
 
-                            docRef2.get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
-                                if (task.isSuccessful) {
-                                    val document2 = task.result?.toString()
-                                    if (!document2?.contains("doc=null")!!) {
-                                        val note: User? = task.result!!.toObject(User::class.java)
-                                        var x = task.result?.data.toString()
-                                        var indx2 = x.indexOf("saldo=") + 6
-                                        x = x.substring(indx2)
-                                        indx2 = x.indexOf(",");
-                                        x = x.substring(0, indx2)
+                                var units =
+                                    (java.util.Calendar.getInstance().timeInMillis.toDouble() - date.toDouble()) / 3600000
+                                var unitsResp = (units * obj.parking_car_cost!!).roundToInt()
 
-                                        var nSaldo = (x.toDouble() - units).roundToInt()
-                                        val saldo = note?.saldo
+                                if (obj != null) {
+                                    tvpark.text = obj.name
+                                    tvabiertodesde.text = obj.opening_hour
+                                    tvabiertohasta.text = obj.closing_hour
+                                    if (hora != "na") {
+                                        tvhorain.text = hora
 
-                                        if (saldo !=null && saldo > cuantopaga) {
-                                            val nuevosaldo = saldo - cuantopaga
-                                            docRef2.update("saldo", nuevosaldo)
+                                        val t1 = horaactual.split(":")
+                                        val t2 = hora.split(":")
 
-                                            Toast.makeText(
-                                                this,
-                                                "Listo! Pagaste $cuantopaga",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                        val h1 = t1[0].toInt()
+                                        val m1 = t1[1].toInt()
 
-                                            lfile.createNewFile()
+                                        val h2 = t2[0].toInt()
+                                        val m2 = t2[1].toInt()
 
-                                            val lfilewriter = FileWriter(lfile)
-                                            val lout = BufferedWriter(lfilewriter)
-                                            lout.write("EMPTY" + ";" + "EMPTY")
-                                            lout.close()
+                                        val diffho = h1 - h2
+                                        val diffmin = m1 - m2
+                                        val tot = 60 * diffho + diffmin
 
-                                            val sharedPref: SharedPreferences? =
-                                                this.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
-                                            if (sharedPref != null) {
-                                                Log.d(
-                                                    "valorespref",
-                                                    sharedPref.getString(PREF_NAME, "DEFAULT")
-                                                )
-                                            }
-                                            val editor = sharedPref?.edit()
-                                            if (editor != null) {
-                                                editor.putString(PREF_NAME, "N")
-                                                editor.apply()
-                                            }
+                                        cuantopaga = tot * costo
+                                        tvapagar.text = cuantopaga.toString()
 
-                                            onBackPressed()
-                                            finish()
-                                        } else {
-                                            Toast.makeText(
-                                                this,
-                                                "No tienes suficiente saldo para este pago",
-                                                Toast.LENGTH_LONG
-                                            ).show()
+                                    } else {
+
+                                        val sharedPref: SharedPreferences? =
+                                            getSharedPreferences(PREF_NAME, PRIVATE_MODE)
+                                        if (sharedPref != null) {
+
+                                            val phora =
+                                                sharedPref.getString("hora_parqueo", "DEFAULT")
+                                            tvhorain.text = phora
+
+                                            val t1 = horaactual.split(":")
+                                            val t2 = phora?.split(":")
+
+                                            val h1 = t1[0].toInt()
+                                            val m1 = t1[1].toInt()
+
+                                            val h2 = t2?.get(0)?.toInt()
+                                            val m2 = t2?.get(1)?.toInt()
+
+                                            val diffho = h1 - h2!!
+                                            val diffmin = m1 - m2!!
+                                            val tot = 60 * diffho + diffmin
+
+
+                                            cuantopaga = tot * costo
+                                            tvapagar.text = cuantopaga.toString()
+
                                         }
                                     }
                                 }
-                            })
+
+                            val sdf = SimpleDateFormat("MM/dd/yyyy")
+                            val netDate = Date(date.toLong())
+
+                            tvcostomin.text = obj.parking_car_cost.toString()
+
+                            //println(tvapagar.text.toString()+tvpark.text.toString()+tvabiertodesde.text.toString()+tvabiertohasta.text.toString()+tvhorain.text.toString()+tvcostomin.text.toString()+tvapagar.text.toString())
+                        })
+                    }
 
 
-        }
 
-        btnIngresar.setOnClickListener {
-            Toast.makeText(this,"Todavía no se puede pagar con un código :(", Toast.LENGTH_SHORT).show();
+            }
+
+            btnVolver.setOnClickListener {
+                onBackPressed()
+            }
+
+            btnOnline.setOnClickListener {
+                //dbHandler.addName(user)
+                var units =
+                    (java.util.Calendar.getInstance().timeInMillis.toDouble() - date.toDouble()) / 3600000
+
+                val sharedPref: SharedPreferences? =
+                    getSharedPreferences("alreadylogged", PRIVATE_MODE)
+                val guser = sharedPref?.getString("username", "DEFAULT")
+                val nuser = guser.toString()
+
+                val docRef2 = database.collection("users").document(nuser)
+
+                docRef2.get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                    if (task.isSuccessful) {
+                        val document2 = task.result?.toString()
+                        if (!document2?.contains("doc=null")!!) {
+                            val note: User? = task.result!!.toObject(User::class.java)
+                            var x = task.result?.data.toString()
+                            var indx2 = x.indexOf("saldo=") + 6
+                            x = x.substring(indx2)
+                            indx2 = x.indexOf(",");
+                            x = x.substring(0, indx2)
+
+                            var nSaldo = (x.toDouble() - units).roundToInt()
+                            val saldo = note?.saldo
+
+                            if (saldo != null && saldo > cuantopaga) {
+                                val nuevosaldo = saldo - cuantopaga
+                                docRef2.update("saldo", nuevosaldo)
+
+                                Toast.makeText(
+                                    this,
+                                    "Listo! Pagaste $cuantopaga",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                lfile.createNewFile()
+
+                                val lfilewriter = FileWriter(lfile)
+                                val lout = BufferedWriter(lfilewriter)
+                                lout.write("EMPTY" + ";" + "EMPTY")
+                                lout.close()
+
+                                val sharedPref: SharedPreferences? =
+                                    this.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
+                                if (sharedPref != null) {
+                                    Log.d(
+                                        "valorespref",
+                                        sharedPref.getString(PREF_NAME, "DEFAULT")
+                                    )
+                                }
+                                val editor = sharedPref?.edit()
+                                if (editor != null) {
+                                    editor.putString(PREF_NAME, "N")
+                                    editor.apply()
+                                }
+
+                                onBackPressed()
+                                finish()
+                            } else {
+                                Toast.makeText(
+                                    this,
+                                    "No tienes suficiente saldo para este pago",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    }
+                })
+
+
+            }
+
+            btnIngresar.setOnClickListener {
+                Toast.makeText(
+                    this,
+                    "Todavía no se puede pagar con un código :(",
+                    Toast.LENGTH_SHORT
+                ).show();
+            }
+
+            println("PASA?")
+            t.start()
         }
     }
 }

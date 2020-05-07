@@ -29,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -98,8 +99,12 @@ class DashboardFragment : Fragment() {
                                         //CREAR un objeto a partir de la bD de firebase
                                         val note: ParqueaderoFirebase? = task.result!!.toObject(ParqueaderoFirebase::class.java)
 
-                                        val currentDateTime = LocalDateTime.now()
-                                        val horaactual= currentDateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+                                       // val currentDateTime = LocalDate.now()
+                                        var calendar = Calendar.getInstance()
+                                        var hour12hrs = calendar.get(Calendar.HOUR)
+                                        var minutes = calendar.get(Calendar.MINUTE)
+                                        //val horaactual= currentDateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+                                        val horaactual = hour12hrs.toString()+":"+minutes.toString()
 
                                         //ponemos en las sharedpreferences la P de PARQUEADO
                                         val sharedPref: SharedPreferences? = activity?.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
