@@ -4,11 +4,7 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.content.SharedPreferences
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -18,17 +14,26 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.example.parkinglot.MainActivity
 import com.example.parkinglot.R
 import com.example.parkinglot.register.ui.register.RegisterActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
     private var PRIVATE_MODE = 0
     private val PREF_NAME = "alreadylogged"
+    // [START declare_auth]
+    private lateinit var auth: FirebaseAuth
+    // [END declare_auth]
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +45,11 @@ class LoginActivity : AppCompatActivity() {
         val login = findViewById<Button>(R.id.login)
         val register = findViewById<Button>(R.id.login2)
         val loading = findViewById<ProgressBar>(R.id.loading)
+
+        // [START initialize_auth]
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance()
+        // [END initialize_auth]
 
         loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
@@ -66,41 +76,59 @@ class LoginActivity : AppCompatActivity() {
 
             loading.visibility = View.VISIBLE
 
-            val db = FirebaseFirestore.getInstance()
-            // [END get_firestore_instance]
-            // [START set_firestore_settings]
-            val settings = FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
-                .build()
-            db.firestoreSettings = settings
-            // [END set_firestore_settings]
-            // TODO: handle loggedInUser authentication
-            db.collection("users")
-                .whereEqualTo("username", us)
-                .whereEqualTo("password", pas)
-                .get()
-                .addOnSuccessListener { documents ->
-                    for (document in documents) {
-                        Log.d("loggeandoxd", "${document.id} => ${document.data}")
-                    }
+            auth.signInWithEmailAndPassword(us, pas)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d("logeo", "signInWithEmail:success")
+                        val user = auth.currentUser
 
-                    if(documents.isEmpty){
-                        Log.d("loggeandoxd", "no existe el user")
+                        val db = FirebaseFirestore.getInstance()
+                        // [END get_firestore_instance]
+                        // [START set_firestore_settings]
+                        val settings = FirebaseFirestoreSettings.Builder()
+                            .setPersistenceEnabled(true)
+                            .build()
+                        db.firestoreSettings = settings
+                        // [END set_firestore_settings]
+                        // TODO: handle loggedInUser authentication
+                        db.collection("users")
+                            .whereEqualTo("username", us)
+                            .whereEqualTo("password", pas)
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                for (document in documents) {
+                                    Log.d("loggeandoxd", "${document.id} => ${document.data}")
+                                }
+
+                                if(documents.isEmpty){
+                                    Log.d("loggeandoxd", "no existe el user")
+                                    showLoginFailed("Usuario y/o contraseña no válida")
+                                    loading.visibility = View.GONE
+                                }
+                                else{
+                                    updateUiWithUser(us)
+                                    setResult(Activity.RESULT_OK)
+
+                                    //Complete and destroy login activity once successful
+                                    finish()
+                                }
+
+                            }
+                            .addOnFailureListener { exception ->
+                                Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                            }
+
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w("logeo", "signInWithEmail:failure", task.exception)
                         showLoginFailed("Usuario y/o contraseña no válida")
                         loading.visibility = View.GONE
                     }
-                    else{
-                        updateUiWithUser(us)
-                        setResult(Activity.RESULT_OK)
 
-                        //Complete and destroy login activity once successful
-                        finish()
-                    }
+                    // ...
+                }
 
-                }
-                .addOnFailureListener { exception ->
-                    Log.w(ContentValues.TAG, "Error getting documents: ", exception)
-                }
 
 
 

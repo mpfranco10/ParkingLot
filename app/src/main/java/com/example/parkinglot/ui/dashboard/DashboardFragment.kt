@@ -73,6 +73,7 @@ class DashboardFragment : Fragment() {
             startActivity(intent)
         }
 
+
         root.bSearch.setOnClickListener { view ->
 
                 var editTextHello = root.findViewById(R.id.textInputEditText) as EditText

@@ -1,28 +1,24 @@
 package com.example.parkinglot
 
-import android.content.ContentValues
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.activity_parqueadero.*
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -41,6 +37,7 @@ class ParqueaderoActivity : AppCompatActivity() {
     private val PREF_NAME = "esta_parqueado"
     var cuantopaga = 0
     var costo = 0
+    var horita = ""
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +57,8 @@ class ParqueaderoActivity : AppCompatActivity() {
         var hour12hrs = calendar.get(Calendar.HOUR)
         var minutes = calendar.get(Calendar.MINUTE)
         var seconds = calendar.get(Calendar.SECOND)
+        val etname = findViewById<View>(R.id.editTextNumero) as EditText
+
         horaactual = hour12hrs.toString() + ":" + minutes.toString() + ":" + seconds.toString()
 
         //val currentDateTime = LocalDateTime.now()
@@ -76,6 +75,7 @@ class ParqueaderoActivity : AppCompatActivity() {
         val btnVolver = findViewById<View>(R.id.buttonBack) as Button
         val btnOnline = findViewById<View>(R.id.buttonPagoon) as Button
         val btnIngresar = findViewById<View>(R.id.buttonIngresarcod) as Button
+        val btnRefrescar = findViewById<View>(R.id.buttonRefresh) as Button
 
         val lfile = File(getFilesDir(), "PARQUEADERO.txt")
         var date = ""
@@ -93,6 +93,7 @@ class ParqueaderoActivity : AppCompatActivity() {
             tvpark.text = obj.name
             tvabiertodesde.text = obj.opening_hour
             tvabiertohasta.text = obj.closing_hour
+            horita = hora
             if (hora != "na") {
                 tvhorain.text = hora
 
@@ -247,7 +248,46 @@ class ParqueaderoActivity : AppCompatActivity() {
 
             }
 
+            btnRefrescar.setOnClickListener {
+
+                val username =  etname.text.toString()
+                if(username!=null && username.trim().length>0){
+                    val cuanto = username.toInt()
+                    if(cuanto>50){
+                        val tiempo  = cuanto/costo
+                        val t = tiempo - 10
+
+                        val cal = Calendar.getInstance()
+                        val intent = Intent(Intent.ACTION_EDIT)
+                        intent.setType("vnd.android.cursor.item/event")
+                        intent.putExtra("beginTime", cal.timeInMillis)
+                        intent.putExtra("allDay", false)
+                        intent.putExtra("endTime", cal.timeInMillis + 60 * t * 1000)
+                        intent.putExtra("title", "Parqueadero cerca de costar $" + username.toString())
+                        startActivity(intent)
+                    }
+                    else{
+                        Toast.makeText(
+                            this,
+                            "El valor debe ser mayor a $50",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+
+                }
+                else{
+                    Toast.makeText(
+                        this,
+                        "Campo vacío",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+
+            }
+
             btnVolver.setOnClickListener {
+
                 onBackPressed()
             }
 

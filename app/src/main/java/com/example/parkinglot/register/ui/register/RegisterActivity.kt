@@ -20,6 +20,7 @@ import com.example.parkinglot.R
 import com.example.parkinglot.register.ui.register.LoggedInUserView
 import com.example.parkinglot.login.ui.login.LoginActivity
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import java.util.*
@@ -31,6 +32,9 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
     private var PRIVATE_MODE = 0
     private val PREF_NAME = "alreadylogged"
+    // [START declare_auth]
+    private lateinit var auth: FirebaseAuth
+    // [END declare_auth]
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +51,11 @@ class RegisterActivity : AppCompatActivity() {
         val tvlogin = findViewById<View>(R.id.tvlogin) as TextView
 
         val loading = findViewById<ProgressBar>(R.id.loadingreg)
+
+        // [START initialize_auth]
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance()
+        // [END initialize_auth]
 
         loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory())
             .get(com.example.parkinglot.register.ui.register.LoginViewModel::class.java)
@@ -86,66 +95,78 @@ class RegisterActivity : AppCompatActivity() {
 
             loading.visibility = View.VISIBLE
 
-            val db = FirebaseFirestore.getInstance()
-            // [END get_firestore_instance]
-            // [START set_firestore_settings]
-            val settings = FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
-                .build()
-            db.firestoreSettings = settings
+            auth.createUserWithEmailAndPassword(username, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d("registro", "createUserWithEmail:success")
+                        val user = auth.currentUser
 
-            db.collection("users")
-                .whereEqualTo("username", username)
-                .get()
-                .addOnSuccessListener { documents ->
-                    for (document in documents) {
-                        Log.d("loggeandoxd", "${document.id} => ${document.data}")
-                    }
+                        val db = FirebaseFirestore.getInstance()
+                        // [END get_firestore_instance]
+                        // [START set_firestore_settings]
+                        val settings = FirebaseFirestoreSettings.Builder()
+                            .setPersistenceEnabled(true)
+                            .build()
+                        db.firestoreSettings = settings
 
-                    if(documents.isEmpty){
+                        db.collection("users")
+                            .whereEqualTo("username", username)
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                for (document in documents) {
+                                    Log.d("loggeandoxd", "${document.id} => ${document.data}")
+                                }
 
-                        val docData = hashMapOf(
-                            "firstname" to firstname,
-                            "lastname" to lastname,
-                            "phone_number" to phone,
-                            "birthday" to Timestamp(Date()),
-                            "gender" to 0,
-                            "saldo" to 10000,
-                            "username" to username,
-                            "password" to password
-                        )
+                                if(documents.isEmpty){
 
-                        db.collection("users").document(username)
-                            .set(docData)
-                            .addOnSuccessListener {
-                                Log.d("Register", "DocumentSnapshot successfully written!")
-                                updateUiWithUser(username)
-                                setResult(Activity.RESULT_OK)
+                                    val docData = hashMapOf(
+                                        "firstname" to firstname,
+                                        "lastname" to lastname,
+                                        "phone_number" to phone,
+                                        "birthday" to Timestamp(Date()),
+                                        "gender" to 0,
+                                        "saldo" to 10000,
+                                        "username" to username,
+                                        "password" to password
+                                    )
 
-                                //Complete and destroy login activity once successful
-                                finish()
+                                    db.collection("users").document(username)
+                                        .set(docData)
+                                        .addOnSuccessListener {
+                                            Log.d("Register", "DocumentSnapshot successfully written!")
+                                            updateUiWithUser(username)
+                                            setResult(Activity.RESULT_OK)
+
+                                            //Complete and destroy login activity once successful
+                                            finish()
+
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Log.w("Register", "Error writing document", e)
+                                            //no se pudo escribir
+                                        }
+
+                                }
+                                else{
+                                    Log.d("loggeandoxd", "no existe el user")
+                                    showLoginFailed("Ya hay un usuario registrado con ese correo")
+                                    loading.visibility = View.GONE
+                                }
 
                             }
-                            .addOnFailureListener { e ->
-                                Log.w("Register", "Error writing document", e)
-                                //no se pudo escribir
+                            .addOnFailureListener { exception ->
+                                Log.w(ContentValues.TAG, "Error getting documents: ", exception)
                             }
-
-
-
-                    }
-                    else{
-                        Log.d("loggeandoxd", "no existe el user")
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w("registro", "createUserWithEmail:failure", task.exception)
                         showLoginFailed("Ya hay un usuario registrado con ese correo")
                         loading.visibility = View.GONE
                     }
 
+                    // ...
                 }
-                .addOnFailureListener { exception ->
-                    Log.w(ContentValues.TAG, "Error getting documents: ", exception)
-                }
-
-
         })
 
         etusername.afterTextChanged {
